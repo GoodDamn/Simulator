@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Simulator</string>
+    <string name="command_line">Command line</string>
+    <string name="visual_odometry">Visual Odometry</string>
+    <string name="blind_arriving">Blind arriving</string>
+    <string name="start_to_follow_of_robot">Start to follow of robot</string>
+    <string name="permission_not_granted">Permission not granted</string>
+    <string name="turn_on_flashlights">Turn On Flashlights</string>
+    <string name="turn_off_flashlights">Turn Off Flashlights</string>
+</resources>

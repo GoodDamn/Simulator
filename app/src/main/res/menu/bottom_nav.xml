@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/nav_camera"
+        android:icon="@drawable/ic_camera"
+        android:title="@string/visual_odometry"/>
+
+    <item android:id="@+id/nav_blind_arriving"
+        android:icon="@drawable/ic_blind_arriving"
+        android:title="@string/blind_arriving"/>
+
+</menu>

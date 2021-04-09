@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/back_colour">
+
+    <EditText
+        android:layout_marginStart="35dp"
+        android:layout_marginEnd="35dp"
+        android:id="@+id/edittext_commandLine"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@drawable/style_edittext"
+        android:fontFamily="@font/rambla"
+        android:gravity="center"
+        android:hint="@string/command_line"
+        android:paddingStart="25dp"
+        android:paddingEnd="15dp"
+        android:singleLine="true"
+        android:drawableStart="@drawable/style_edittext_drawable"
+        android:layout_marginTop="35dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <Button
+        android:id="@+id/button_turnOnOff_Flashlights"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginHorizontal="22dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/turn_on_flashlights"
+        android:textAllCaps="false"
+        android:fontFamily="@font/rambla"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/style_button_turned_off_flashlight"
+        app:layout_constraintTop_toBottomOf="@+id/edittext_commandLine"
+        tools:layout_editor_absoluteX="0dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

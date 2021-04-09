@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#FFFFFF</color>
+    <color name="colorPrimaryDark">#FFFFFF</color>
+    <color name="colorAccent">#FFFFFF</color>
+    <color name="back_colour">#FFFFFF</color>
+    <color name="edittext_back_colour">#F2F7FC</color>
+    <color name="edittext_stroke_colour">#2B262C42</color>
+    <color name="icon_cl">#2B262C42</color>
+    <color name="icons_nav_bar">#171D2F</color>
+    <color name="NavBottomBar_back_colour">#FFFFFF</color>
+</resources>
