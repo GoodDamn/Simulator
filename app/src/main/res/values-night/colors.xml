@@ -9,4 +9,5 @@
     <color name="icon_cl">#2B2D3447</color>
     <color name="icons_nav_bar">#FFFFFF</color>
     <color name="NavBottomBar_back_colour">#424D68</color>
+    <color name="textColour">#FFFFFF</color>
 </resources>

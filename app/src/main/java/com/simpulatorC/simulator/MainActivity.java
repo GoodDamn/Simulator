@@ -5,8 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.simpulatorC.simulator.fragmentAdapters.FragmentAdapterMain;
@@ -14,6 +18,16 @@ import com.simpulatorC.simulator.fragments.FragmentBlindArriving;
 import com.simpulatorC.simulator.fragments.FragmentCamera;
 
 public class MainActivity extends AppCompatActivity {
+
+    private void HideKeyboard() // Method, which hide soft keyboard.
+    {
+        View view = getCurrentFocus();
+        if (view != null)
+        {
+            ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
+                    .hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -26,6 +40,15 @@ public class MainActivity extends AppCompatActivity {
 
         viewPager.setAdapter(new FragmentAdapterMain(getSupportFragmentManager())); // Set Fragments for view pager
         viewPager.setCurrentItem(0); // Set "Visual Odometry" page. (Default)
+
+        viewPager.setOnTouchListener(new View.OnTouchListener() { // Listen, when user touched down.
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if(motionEvent.getAction() == MotionEvent.ACTION_DOWN)
+                    HideKeyboard(); // Hide keyboard, if user used EditText.
+                return false;
+            }
+        });
 
         viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() { // Listen, when user scrolled view pager;
             @Override public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }

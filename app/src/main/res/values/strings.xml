@@ -7,4 +7,14 @@
     <string name="permission_not_granted">Permission not granted</string>
     <string name="turn_on_flashlights">Turn On Flashlights</string>
     <string name="turn_off_flashlights">Turn Off Flashlights</string>
+    <string name="executed">Executed!</string>
+    <string name="dont_find_command">I can\'t find this command :(</string>
+    <string name="state">State:</string>
+    <string name="moveForward">forward</string>
+    <string name="moveBack">back </string>
+    <string name="moveRight">right</string>
+    <string name="moveLeft">left</string>
+    <string name="robot">Robot is moving</string>
+    <string name="on">on</string>
+    <string name="meters">meters</string>
 </resources>
