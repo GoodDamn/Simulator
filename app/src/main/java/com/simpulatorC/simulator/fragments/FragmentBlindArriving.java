@@ -1,31 +1,23 @@
 package com.simpulatorC.simulator.fragments;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-
 import com.simpulatorC.simulator.R;
 
 public class FragmentBlindArriving extends Fragment {
@@ -33,7 +25,7 @@ public class FragmentBlindArriving extends Fragment {
     private EditText commandLine;
     private Button turnFlashlights;
     private ImageButton moveForward, moveRight,
-        moveBack, moveLeft;
+        moveBack, moveLeft, sleep_mode;
     private TextView state;
     private Animation fadeIn_state, fadeOut_state;
 
@@ -41,7 +33,7 @@ public class FragmentBlindArriving extends Fragment {
         return getResources().getDrawable(id);
     }
 
-    private void TurnOnOffFlashlight(int textColour, String text, int drawableId)
+    private void TurnOnOffFlashlight(int textColour, String text, int drawableId) // Method, which enable/disable flashlights
     {
         turnFlashlights.setBackgroundResource(drawableId);
         turnFlashlights.setText(text);
@@ -53,25 +45,40 @@ public class FragmentBlindArriving extends Fragment {
     {
         if (!isMoving)
         {
+            // True, if robot isn't moving.
             isMoving = true;
             button.setBackgroundResource(R.drawable.moving_active);
             state.setText(getString(R.string.state) +" "+
                     getString(R.string.robot) +" "+  side +" "+
                     getString(R.string.on) +" "+ meters +" "+ getString(R.string.meters));
             state.startAnimation(fadeOut_state);
-            new Handler().postDelayed(new Runnable() {
+            new Handler().postDelayed(new Runnable() { // Delaying independently number of meters.
                 @Override
                 public void run() {
                     isMoving = false;
                     state.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fadein));
                     state.setText(getString(R.string.state));
-                    button.setBackgroundResource(R.drawable.style_button_turned_off_flashlight);
+                    button.setBackgroundResource(R.drawable.style_button_rounded_black);
                 }
-            }, 750 * meters);
+            }, 750 * meters);// Delay
         }
     }
 
-    private int getNumberFromCommand(String command)
+    private void SleepMode(boolean enabled, Animation animation, String textState, int idDrawable) // Method, which disable/enable sleep mode
+    {
+        sleep_mode.setBackgroundResource(idDrawable);
+        state.setText(getString(R.string.state) +" "+ textState);
+        state.startAnimation(animation);
+        //Disable all components on the screen.
+        moveBack.setEnabled(enabled);
+        moveLeft.setEnabled(enabled);
+        moveRight.setEnabled(enabled);
+        moveForward.setEnabled(enabled);
+        turnFlashlights.setEnabled(enabled);
+        commandLine.setEnabled(enabled);
+    }
+
+    private int getNumberFromCommand(String command) // Get nuumber, if command has numbers
     {
         String number = "";
         for (char ch : command.toCharArray()) {
@@ -83,7 +90,7 @@ public class FragmentBlindArriving extends Fragment {
         return Integer.parseInt(number);
     }
 
-    private String getCommand(String command)
+    private String getCommand(String command) // Get command name from command line with numbers
     {
         String com = "";
         for (char ch : command.toCharArray()) {
@@ -109,25 +116,25 @@ public class FragmentBlindArriving extends Fragment {
         }
         switch (command)
         {
-            case "turnonflashlights":
+            case "turnonflashlights": // Turn on flashlights
                 command = "Flashlights have been turned on";
                 TurnOnOffFlashlight(Color.BLACK, getString(R.string.turn_on_flashlights),
-                        R.drawable.style_button_turned_on_flashlight);
+                        R.drawable.style_button_rounded_yellow);
                 break;
-            case "turnoffflashlights":
+            case "turnoffflashlights": // Turn off flashlights
                 command = "Flashlights have been turned off";
                 TurnOnOffFlashlight(Color.WHITE, getString(R.string.turn_off_flashlights),
-                        R.drawable.style_button_turned_off_flashlight);
+                        R.drawable.style_button_rounded_black);
                 break;
-            case "moveforward": Move(getString(R.string.moveForward), moveForward, numSteps);break;
-            case "moveback": Move(getString(R.string.moveBack), moveBack, numSteps);break;
-            case "moveright": Move(getString(R.string.moveRight), moveRight, numSteps);break;
-            case "moveleft": Move(getString(R.string.moveLeft), moveLeft, numSteps);break;
-            default:
+            case "moveforward": Move(getString(R.string.moveForward), moveForward, numSteps);break; // Move forward
+            case "moveback": Move(getString(R.string.moveBack), moveBack, numSteps);break; // Move back
+            case "moveright": Move(getString(R.string.moveRight), moveRight, numSteps);break; // move right
+            case "moveleft": Move(getString(R.string.moveLeft), moveLeft, numSteps);break; // move left
+            default: // If user typed other command.
                 command = getString(R.string.dont_find_command);
                 break;
         }
-        Toast.makeText(getContext(), command, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), command, Toast.LENGTH_SHORT).show(); // Show message to user.
     }
 
     @Nullable @Override
@@ -158,6 +165,22 @@ public class FragmentBlindArriving extends Fragment {
             @Override public void onAnimationRepeat(Animation animation) { }
         });
 
+        sleep_mode = v.findViewById(R.id.Ibutton_sleepMode);
+        sleep_mode.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View view) {
+                if (sleep_mode.getBackground().getConstantState().equals(getDrawable(R.drawable.style_button_rounded_black).getConstantState()))
+                    // Enable sleep mode
+                    SleepMode(false, fadeIn_state, "Robot is sleeping", R.drawable.style_button_rounded_blue);
+                else
+                {
+                    //Disable sleep mode
+                    state.startAnimation(AnimationUtils.loadAnimation(getContext(),R.anim.fadein));
+                    SleepMode(true,AnimationUtils.loadAnimation(getContext(),R.anim.fadein),
+                            "", R.drawable.style_button_rounded_black);
+                }
+            }
+        });
+
         moveForward.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) { Move(getString(R.string.moveForward), moveForward, 2); }});
         moveBack.setOnClickListener(new View.OnClickListener() {
@@ -168,7 +191,7 @@ public class FragmentBlindArriving extends Fragment {
             @Override public void onClick(View view) { Move(getString(R.string.moveLeft), moveLeft,2); }});
 
         commandLine = v.findViewById(R.id.edittext_commandLine);
-        commandLine.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        commandLine.setOnEditorActionListener(new TextView.OnEditorActionListener() { // Action, when user clicked "Enter" on soft keyboard.
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 ExecuteCommand();
@@ -184,11 +207,11 @@ public class FragmentBlindArriving extends Fragment {
                 // If button had the state "Turned off"
                 if (turnFlashlights.getBackground()
                         .getConstantState()
-                        .equals(getDrawable(R.drawable.style_button_turned_off_flashlight).getConstantState()))
+                        .equals(getDrawable(R.drawable.style_button_rounded_black).getConstantState()))
                     TurnOnOffFlashlight(Color.BLACK, getString(R.string.turn_on_flashlights),
-                            R.drawable.style_button_turned_on_flashlight); // Change state of button on "Turn on"
+                            R.drawable.style_button_rounded_yellow); // Change state of button on "Turn on"
                 else TurnOnOffFlashlight(Color.WHITE, getString(R.string.turn_off_flashlights),
-                        R.drawable.style_button_turned_off_flashlight); // Change state of button on "Turn off"
+                        R.drawable.style_button_rounded_black); // Change state of button on "Turn off"
 
             }
         });
