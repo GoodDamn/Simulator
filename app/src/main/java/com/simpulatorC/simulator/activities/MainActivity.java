@@ -1,4 +1,4 @@
-package com.simpulatorC.simulator;
+package com.simpulatorC.simulator.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.simpulatorC.simulator.R;
 import com.simpulatorC.simulator.fragmentAdapters.FragmentAdapterMain;
 import com.simpulatorC.simulator.fragments.FragmentBlindArriving;
 import com.simpulatorC.simulator.fragments.FragmentCamera;

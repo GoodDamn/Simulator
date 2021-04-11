@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,113 +7,122 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/back_colour">
 
-    <EditText
-        android:id="@+id/edittext_commandLine"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginStart="35dp"
-        android:layout_marginTop="68dp"
-        android:layout_marginEnd="35dp"
-        android:background="@drawable/style_edittext"
-        android:drawableStart="@drawable/style_edittext_drawable"
-        android:fontFamily="@font/rambla"
-        android:gravity="center"
-        android:hint="@string/command_line"
-        android:imeOptions="actionDone"
-        android:paddingStart="25dp"
-        android:paddingEnd="15dp"
-        android:singleLine="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="match_parent"
+        android:background="@color/back_colour">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/back_colour">
+            <EditText
+                android:id="@+id/edittext_commandLine"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginStart="35dp"
+                android:layout_marginTop="68dp"
+                android:layout_marginEnd="35dp"
+                android:background="@drawable/style_edittext"
+                android:drawableStart="@drawable/style_edittext_drawable"
+                android:fontFamily="@font/rambla"
+                android:gravity="center"
+                android:hint="@string/command_line"
+                android:imeOptions="actionDone"
+                android:paddingStart="25dp"
+                android:paddingEnd="15dp"
+                android:singleLine="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/textView_state"
-        android:text="@string/state"
-        android:fontFamily="@font/rambla"
-        android:layout_marginHorizontal="40dp"
-        android:layout_marginTop="15dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        android:textColor="@color/textColour"/>
+            <TextView
+                android:id="@+id/textView_state"
+                android:text="@string/state"
+                android:fontFamily="@font/rambla"
+                android:layout_marginHorizontal="40dp"
+                android:layout_marginTop="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                android:textColor="@color/textColour"/>
 
-    <ImageView
-        android:id="@+id/ImageView_commands"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginTop="15dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/ic_commands"/>
+            <ImageView
+                android:id="@+id/ImageView_commands"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginTop="15dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:background="@drawable/ic_commands"/>
 
-    <ImageButton
-        android:id="@+id/Ibutton_move_forward"
-        android:layout_width="150dp"
-        android:layout_height="45dp"
-        android:layout_marginHorizontal="85dp"
-        android:background="@drawable/style_button_rounded_black"
-        android:src="@drawable/ic_arrow_forward"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.404"
-        app:layout_constraintStart_toEndOf="@+id/button_turnOnOff_Flashlights"
-        app:layout_constraintTop_toTopOf="@+id/button_turnOnOff_Flashlights" />
+            <ImageButton
+                android:id="@+id/Ibutton_move_forward"
+                android:layout_width="150dp"
+                android:layout_height="45dp"
+                android:layout_marginHorizontal="85dp"
+                android:background="@drawable/style_button_rounded_black"
+                android:src="@drawable/ic_arrow_forward"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.404"
+                app:layout_constraintStart_toEndOf="@+id/button_turnOnOff_Flashlights"
+                app:layout_constraintTop_toTopOf="@+id/button_turnOnOff_Flashlights" />
 
-    <ImageButton
-        android:id="@+id/Ibutton_move_Left"
-        android:layout_width="75dp"
-        android:layout_height="150dp"
-        android:background="@drawable/style_button_rounded_black"
-        android:src="@drawable/ic_arrow_left"
-        app:layout_constraintStart_toStartOf="@+id/Ibutton_move_back"
-        app:layout_constraintTop_toBottomOf="@+id/Ibutton_move_forward" />
+            <ImageButton
+                android:id="@+id/Ibutton_move_Left"
+                android:layout_width="75dp"
+                android:layout_height="150dp"
+                android:background="@drawable/style_button_rounded_black"
+                android:src="@drawable/ic_arrow_left"
+                app:layout_constraintStart_toStartOf="@+id/Ibutton_move_back"
+                app:layout_constraintTop_toBottomOf="@+id/Ibutton_move_forward" />
 
-    <ImageButton
-        android:id="@+id/Ibutton_move_right"
-        android:layout_width="75dp"
-        android:layout_height="150dp"
-        android:background="@drawable/style_button_rounded_black"
-        android:src="@drawable/ic_arrow_right"
-        app:layout_constraintEnd_toEndOf="@+id/Ibutton_move_forward"
-        app:layout_constraintTop_toBottomOf="@+id/Ibutton_move_forward" />
+            <ImageButton
+                android:id="@+id/Ibutton_move_right"
+                android:layout_width="75dp"
+                android:layout_height="150dp"
+                android:background="@drawable/style_button_rounded_black"
+                android:src="@drawable/ic_arrow_right"
+                app:layout_constraintEnd_toEndOf="@+id/Ibutton_move_forward"
+                app:layout_constraintTop_toBottomOf="@+id/Ibutton_move_forward" />
 
-    <ImageButton
-        android:id="@+id/Ibutton_sleepMode"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@drawable/style_button_rounded_black"
-        app:layout_constraintTop_toBottomOf="@+id/Ibutton_move_back"
-        android:layout_marginTop="25dp"
-        android:layout_marginHorizontal="35dp"
-        android:src="@drawable/moon"/>
+            <ImageButton
+                android:id="@+id/Ibutton_sleepMode"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/style_button_rounded_black"
+                app:layout_constraintTop_toBottomOf="@+id/Ibutton_move_back"
+                android:layout_marginTop="25dp"
+                android:layout_marginHorizontal="35dp"
+                android:src="@drawable/moon"/>
 
-    <ImageButton
-        android:id="@+id/Ibutton_move_back"
-        android:layout_width="150dp"
-        android:layout_height="45dp"
-        android:layout_marginHorizontal="85dp"
-        android:background="@drawable/style_button_rounded_black"
-        android:src="@drawable/ic_arrow_back"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.404"
-        app:layout_constraintStart_toEndOf="@+id/button_turnOnOff_Flashlights"
-        app:layout_constraintTop_toBottomOf="@+id/Ibutton_move_Left" />
+            <ImageButton
+                android:id="@+id/Ibutton_move_back"
+                android:layout_width="150dp"
+                android:layout_height="45dp"
+                android:layout_marginHorizontal="85dp"
+                android:background="@drawable/style_button_rounded_black"
+                android:src="@drawable/ic_arrow_back"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.404"
+                app:layout_constraintStart_toEndOf="@+id/button_turnOnOff_Flashlights"
+                app:layout_constraintTop_toBottomOf="@+id/Ibutton_move_Left" />
 
-    <Button
-        android:id="@+id/button_turnOnOff_Flashlights"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_marginStart="22dp"
-        android:layout_marginEnd="195dp"
-        android:layout_marginTop="20dp"
-        android:text="@string/turn_on_flashlights"
-        android:textAllCaps="false"
-        android:fontFamily="@font/rambla"
-        android:textColor="#FFFFFF"
-        android:background="@drawable/style_button_rounded_black"
-        app:layout_constraintTop_toBottomOf="@+id/edittext_commandLine"
-        tools:layout_editor_absoluteX="0dp" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <Button
+                android:id="@+id/button_turnOnOff_Flashlights"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginStart="22dp"
+                android:layout_marginEnd="195dp"
+                android:layout_marginTop="20dp"
+                android:text="@string/turn_on_flashlights"
+                android:textAllCaps="false"
+                android:fontFamily="@font/rambla"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/style_button_rounded_black"
+                app:layout_constraintTop_toBottomOf="@+id/edittext_commandLine"
+                tools:layout_editor_absoluteX="0dp" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</RelativeLayout>

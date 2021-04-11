@@ -1,5 +1,6 @@
 package com.simpulatorC.simulator.fragments;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -18,9 +19,15 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.simpulatorC.simulator.FileStream;
 import com.simpulatorC.simulator.R;
 
+import java.io.FileNotFoundException;
+
 public class FragmentBlindArriving extends Fragment {
+
+    private static String STATE_FILE = "State";
 
     private EditText commandLine;
     private Button turnFlashlights;
@@ -169,14 +176,26 @@ public class FragmentBlindArriving extends Fragment {
         sleep_mode.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {
                 if (sleep_mode.getBackground().getConstantState().equals(getDrawable(R.drawable.style_button_rounded_black).getConstantState()))
+                {
                     // Enable sleep mode
                     SleepMode(false, fadeIn_state, "Robot is sleeping", R.drawable.style_button_rounded_blue);
+                    try {
+                        new FileStream().SaveFile("Sleep", getActivity().openFileOutput(STATE_FILE, Context.MODE_PRIVATE));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
                 else
                 {
                     //Disable sleep mode
                     state.startAnimation(AnimationUtils.loadAnimation(getContext(),R.anim.fadein));
                     SleepMode(true,AnimationUtils.loadAnimation(getContext(),R.anim.fadein),
                             "", R.drawable.style_button_rounded_black);
+                    try {
+                        new FileStream().SaveFile("", getActivity().openFileOutput(STATE_FILE, Context.MODE_PRIVATE));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -215,6 +234,23 @@ public class FragmentBlindArriving extends Fragment {
 
             }
         });
+
+        // Load current state from text file from device storage.
+        String text = null;
+        try {
+            text = new FileStream().ReadFile(getActivity().openFileInput(STATE_FILE));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        if (text != null)
+        {
+            switch (text)
+            {
+                case "Sleep":
+                    SleepMode(false, fadeIn_state, "Robot is sleeping", R.drawable.style_button_rounded_blue);
+                    break;
+            }
+        }
 
         return v;
     }

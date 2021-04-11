@@ -7,28 +7,37 @@
     android:layout_height="match_parent"
     android:background="@color/back_colour">
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/frag_camera_start_to_follow"
-        android:layout_marginTop="150dp"
-        android:layout_marginBottom="150dp"
-        android:layout_marginStart="50dp"
-        android:layout_marginEnd="50dp"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="#C4C4C4"
-        app:shapeAppearanceOverlay="@style/RoundedCircle" />
+        android:background="@color/back_colour">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/back_colour">
 
-    <TextView
-        android:id="@+id/fragment_camera_hint"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:text="@string/start_to_follow_of_robot"
-        android:fontFamily="@font/rambla"
-        android:layout_marginTop="150dp"
-        android:layout_marginBottom="150dp"
-        android:layout_marginStart="50dp"
-        android:layout_marginEnd="50dp"/>
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/frag_camera_start_to_follow"
+                android:layout_width="250dp"
+                android:layout_height="350dp"
+                android:src="#C4C4C4"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="150dp"
+                app:shapeAppearanceOverlay="@style/RoundedCircle" />
 
+            <TextView
+                android:id="@+id/fragment_camera_hint"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fontFamily="@font/rambla"
+                android:gravity="center"
+                android:text="@string/start_to_follow_of_robot"
+                app:layout_constraintBottom_toBottomOf="@+id/frag_camera_start_to_follow"
+                app:layout_constraintTop_toTopOf="@+id/frag_camera_start_to_follow"
+                tools:layout_editor_absoluteX="50dp" />
 
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 </RelativeLayout>
