@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,11 +24,16 @@ import androidx.fragment.app.Fragment;
 import com.simpulatorC.simulator.FileStream;
 import com.simpulatorC.simulator.R;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Calendar;
 
 public class FragmentBlindArriving extends Fragment {
 
-    private static String STATE_FILE = "State";
+    private static String STATE_FILE = "State",
+        TIME_FILE = "Time",
+        DIRECTION_FILE = "Direction",
+        METERS_FILE = "Meters";
 
     private EditText commandLine;
     private Button turnFlashlights;
@@ -35,6 +41,8 @@ public class FragmentBlindArriving extends Fragment {
         moveBack, moveLeft, sleep_mode;
     private TextView state;
     private Animation fadeIn_state, fadeOut_state;
+    private Runnable mainRunnable;
+
 
     private Drawable getDrawable(int id) { // Method, which return picture from project's resources.
         return getResources().getDrawable(id);
@@ -48,17 +56,29 @@ public class FragmentBlindArriving extends Fragment {
     }
 
     private boolean isMoving = false;
-    private void Move(String side, final ImageButton button, int meters)
+    private void Move(String direction, final ImageButton button, int meters, long delay) // MOVE
     {
         if (!isMoving)
         {
+            final Drawable general = button.getBackground();
             // True, if robot isn't moving.
             isMoving = true;
+            // Save state
+            FileStream fileStream = new FileStream();
+            try
+            {
+                fileStream.SaveFile("Move", getActivity().openFileOutput(STATE_FILE, Context.MODE_PRIVATE)); // Save state
+                fileStream.SaveFile(String.valueOf(meters),getActivity().openFileOutput(METERS_FILE, Context.MODE_PRIVATE)); // Save distance
+                fileStream.SaveFile(direction, getActivity().openFileOutput(DIRECTION_FILE, Context.MODE_PRIVATE)); // Save direction of moving
+            } catch (FileNotFoundException e) { e.printStackTrace(); }
+
+            button.setImageResource(R.drawable.ic_cancel_execution);
             button.setBackgroundResource(R.drawable.moving_active);
             state.setText(getString(R.string.state) +" "+
-                    getString(R.string.robot) +" "+  side +" "+
+                    getString(R.string.robot) +" "+  direction +" "+
                     getString(R.string.on) +" "+ meters +" "+ getString(R.string.meters));
             state.startAnimation(fadeOut_state);
+
             new Handler().postDelayed(new Runnable() { // Delaying independently number of meters.
                 @Override
                 public void run() {
@@ -66,8 +86,9 @@ public class FragmentBlindArriving extends Fragment {
                     state.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fadein));
                     state.setText(getString(R.string.state));
                     button.setBackgroundResource(R.drawable.style_button_rounded_black);
+                    button.setImageDrawable(general);
                 }
-            }, 750 * meters);// Delay
+            }, delay);// Delay
         }
     }
 
@@ -133,10 +154,13 @@ public class FragmentBlindArriving extends Fragment {
                 TurnOnOffFlashlight(Color.WHITE, getString(R.string.turn_off_flashlights),
                         R.drawable.style_button_rounded_black);
                 break;
-            case "moveforward": Move(getString(R.string.moveForward), moveForward, numSteps);break; // Move forward
-            case "moveback": Move(getString(R.string.moveBack), moveBack, numSteps);break; // Move back
-            case "moveright": Move(getString(R.string.moveRight), moveRight, numSteps);break; // move right
-            case "moveleft": Move(getString(R.string.moveLeft), moveLeft, numSteps);break; // move left
+            case "sleep": SleepMode(false, fadeIn_state, getString(R.string.robot_sleep), R.drawable.style_button_rounded_blue); break;
+            case "wake up": SleepMode(true, AnimationUtils.loadAnimation(getContext(), R.anim.fadein),
+                    "", R.drawable.style_button_rounded_black); break;
+            case "moveforward": Move(getString(R.string.moveForward), moveForward, numSteps, 750 * numSteps);break; // Move forward
+            case "moveback": Move(getString(R.string.moveBack), moveBack, numSteps, 750 * numSteps);break; // Move back
+            case "moveright": Move(getString(R.string.moveRight), moveRight, numSteps, 750 * numSteps);break; // move right
+            case "moveleft": Move(getString(R.string.moveLeft), moveLeft, numSteps, 750 * numSteps);break; // move left
             default: // If user typed other command.
                 command = getString(R.string.dont_find_command);
                 break;
@@ -201,13 +225,16 @@ public class FragmentBlindArriving extends Fragment {
         });
 
         moveForward.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View view) { Move(getString(R.string.moveForward), moveForward, 2); }});
+            @Override public void onClick(View view) {
+                Move(getString(R.string.moveForward), moveForward, 2, 1500);
+            }
+        });
         moveBack.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View view) { Move(getString(R.string.moveBack), moveBack, 2); }});
+            @Override public void onClick(View view) { Move(getString(R.string.moveBack), moveBack, 2,1500); }});
         moveRight.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View view) { Move(getString(R.string.moveRight), moveRight,2); }});
+            @Override public void onClick(View view) { Move(getString(R.string.moveRight), moveRight,2, 1500); }});
         moveLeft.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View view) { Move(getString(R.string.moveLeft), moveLeft,2); }});
+            @Override public void onClick(View view) { Move(getString(R.string.moveLeft), moveLeft,2, 1500); }});
 
         commandLine = v.findViewById(R.id.edittext_commandLine);
         commandLine.setOnEditorActionListener(new TextView.OnEditorActionListener() { // Action, when user clicked "Enter" on soft keyboard.
@@ -249,9 +276,54 @@ public class FragmentBlindArriving extends Fragment {
                 case "Sleep":
                     SleepMode(false, fadeIn_state, "Robot is sleeping", R.drawable.style_button_rounded_blue);
                     break;
+                case "Move":
+                    try
+                    {
+                        FileStream fileStream = new FileStream();
+                        long previousTime = Long.parseLong(fileStream.ReadFile(getActivity().openFileInput(TIME_FILE))),
+                            currentTime = Calendar.getInstance().getTimeInMillis();
+                        int meters = Integer.parseInt(fileStream.ReadFile(getActivity().openFileInput(METERS_FILE)));
+                        long currentDelay = 750 * meters - (currentTime - previousTime);
+                        Log.d("123456", fileStream.ReadFile(getActivity().openFileInput(DIRECTION_FILE)));
+                        switch (fileStream.ReadFile(getActivity().openFileInput(DIRECTION_FILE)))
+                        {
+                            case "forward":
+                                Log.d("123456", "asdzxc");
+                                Move(getString(R.string.moveForward), moveForward, meters, currentDelay);
+                                break;
+                            case "left":
+                                Log.d("123456", "asdzxc");
+                                Move(getString(R.string.moveLeft), moveLeft, meters, currentDelay);
+                                break;
+                            case "right":
+                                Log.d("123456", "asdzxc");
+                                Move(getString(R.string.moveRight), moveRight, meters, currentDelay);
+                                break;
+                            case "back":
+                                Log.d("123456", "asdzxc");
+                                Move(getString(R.string.moveBack), moveBack, meters, currentDelay);
+                                break;
+                        }
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    break;
             }
         }
 
         return v;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (isMoving)
+        {
+            try { // Save time, if user quited from app.
+                new FileStream().SaveFile(String.valueOf(Calendar.getInstance().getTimeInMillis()), getActivity().openFileOutput(TIME_FILE, Context.MODE_PRIVATE));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

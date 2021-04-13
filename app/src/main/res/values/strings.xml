@@ -18,4 +18,5 @@
     <string name="on">on</string>
     <string name="meters">meters</string>
     <string name="sleep">Robot is sleeping</string>
+    <string name="robot_sleep">Robot is sleeping</string>
 </resources>
