@@ -19,4 +19,5 @@
     <string name="meters">meters</string>
     <string name="sleep">Robot is sleeping</string>
     <string name="robot_sleep">Robot is sleeping</string>
+    <string name="cancelled">Cancelled</string>
 </resources>

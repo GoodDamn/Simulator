@@ -41,8 +41,24 @@ public class FragmentBlindArriving extends Fragment {
         moveBack, moveLeft, sleep_mode;
     private TextView state;
     private Animation fadeIn_state, fadeOut_state;
-    private Runnable mainRunnable;
+    private Handler handler;
+    private boolean isMoving = false;
+    private Drawable generalDrawable;
+    private ImageButton selectedDirection;
 
+    private void ShowToastMessage(String text) { Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();}
+
+    private void ReturnToGeneralState() // When handler is posted delayed.
+    {
+        handler.removeCallbacksAndMessages(null);
+        handler = null;
+        isMoving = false;
+        state.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fadein));
+        state.setText(getString(R.string.state));
+        selectedDirection.setBackgroundResource(R.drawable.style_button_rounded_black);
+        selectedDirection.setImageDrawable(generalDrawable);
+        ShowToastMessage(getString(R.string.cancelled));
+    }
 
     private Drawable getDrawable(int id) { // Method, which return picture from project's resources.
         return getResources().getDrawable(id);
@@ -55,12 +71,12 @@ public class FragmentBlindArriving extends Fragment {
         turnFlashlights.setTextColor(textColour);
     }
 
-    private boolean isMoving = false;
     private void Move(String direction, final ImageButton button, int meters, long delay) // MOVE
     {
         if (!isMoving)
         {
-            final Drawable general = button.getBackground();
+            handler = new Handler();
+            generalDrawable = button.getDrawable();
             // True, if robot isn't moving.
             isMoving = true;
             // Save state
@@ -72,21 +88,19 @@ public class FragmentBlindArriving extends Fragment {
                 fileStream.SaveFile(direction, getActivity().openFileOutput(DIRECTION_FILE, Context.MODE_PRIVATE)); // Save direction of moving
             } catch (FileNotFoundException e) { e.printStackTrace(); }
 
-            button.setImageResource(R.drawable.ic_cancel_execution);
-            button.setBackgroundResource(R.drawable.moving_active);
+            selectedDirection = button;
+            selectedDirection.setImageResource(R.drawable.ic_cancel_execution);
+            selectedDirection.setBackgroundResource(R.drawable.moving_active);
+
             state.setText(getString(R.string.state) +" "+
                     getString(R.string.robot) +" "+  direction +" "+
                     getString(R.string.on) +" "+ meters +" "+ getString(R.string.meters));
             state.startAnimation(fadeOut_state);
 
-            new Handler().postDelayed(new Runnable() { // Delaying independently number of meters.
+            handler.postDelayed(new Runnable() { // Delaying independently number of meters.
                 @Override
                 public void run() {
-                    isMoving = false;
-                    state.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fadein));
-                    state.setText(getString(R.string.state));
-                    button.setBackgroundResource(R.drawable.style_button_rounded_black);
-                    button.setImageDrawable(general);
+                    ReturnToGeneralState();
                 }
             }, delay);// Delay
         }
@@ -106,7 +120,7 @@ public class FragmentBlindArriving extends Fragment {
         commandLine.setEnabled(enabled);
     }
 
-    private int getNumberFromCommand(String command) // Get nuumber, if command has numbers
+    private int getNumberFromCommand(String command) // Get number, if command has numbers
     {
         String number = "";
         for (char ch : command.toCharArray()) {
@@ -155,8 +169,6 @@ public class FragmentBlindArriving extends Fragment {
                         R.drawable.style_button_rounded_black);
                 break;
             case "sleep": SleepMode(false, fadeIn_state, getString(R.string.robot_sleep), R.drawable.style_button_rounded_blue); break;
-            case "wake up": SleepMode(true, AnimationUtils.loadAnimation(getContext(), R.anim.fadein),
-                    "", R.drawable.style_button_rounded_black); break;
             case "moveforward": Move(getString(R.string.moveForward), moveForward, numSteps, 750 * numSteps);break; // Move forward
             case "moveback": Move(getString(R.string.moveBack), moveBack, numSteps, 750 * numSteps);break; // Move back
             case "moveright": Move(getString(R.string.moveRight), moveRight, numSteps, 750 * numSteps);break; // move right
@@ -198,9 +210,11 @@ public class FragmentBlindArriving extends Fragment {
 
         sleep_mode = v.findViewById(R.id.Ibutton_sleepMode);
         sleep_mode.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View view) {
+            @Override public void onClick(View view) { // Sleep mode
                 if (sleep_mode.getBackground().getConstantState().equals(getDrawable(R.drawable.style_button_rounded_black).getConstantState()))
                 {
+                    if (handler != null) // Disable postDelayed method, when robot is moving.
+                        ReturnToGeneralState();
                     // Enable sleep mode
                     SleepMode(false, fadeIn_state, "Robot is sleeping", R.drawable.style_button_rounded_blue);
                     try {
@@ -226,15 +240,32 @@ public class FragmentBlindArriving extends Fragment {
 
         moveForward.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {
-                Move(getString(R.string.moveForward), moveForward, 2, 1500);
+                if (moveForward.getBackground().getConstantState().equals(getDrawable(R.drawable.moving_active).getConstantState()))
+                    ReturnToGeneralState();
+                else Move(getString(R.string.moveForward), moveForward, 2, 1500);
             }
         });
+
         moveBack.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View view) { Move(getString(R.string.moveBack), moveBack, 2,1500); }});
+            @Override public void onClick(View view) {
+                if (moveBack.getBackground().getConstantState().equals(getDrawable(R.drawable.moving_active).getConstantState()))
+                    ReturnToGeneralState();
+                else Move(getString(R.string.moveBack), moveBack, 2,1500);
+            }});
         moveRight.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View view) { Move(getString(R.string.moveRight), moveRight,2, 1500); }});
+            @Override public void onClick(View view) {
+                if (moveRight.getBackground().getConstantState().equals(getDrawable(R.drawable.moving_active).getConstantState()))
+                    ReturnToGeneralState();
+                else Move(getString(R.string.moveRight), moveRight, 2,1500);
+            }
+        });
         moveLeft.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View view) { Move(getString(R.string.moveLeft), moveLeft,2, 1500); }});
+            @Override public void onClick(View view) {
+                if (moveLeft.getBackground().getConstantState().equals(getDrawable(R.drawable.moving_active).getConstantState()))
+                    ReturnToGeneralState();
+                else Move(getString(R.string.moveLeft), moveLeft, 2,1500);
+            }
+        });
 
         commandLine = v.findViewById(R.id.edittext_commandLine);
         commandLine.setOnEditorActionListener(new TextView.OnEditorActionListener() { // Action, when user clicked "Enter" on soft keyboard.
@@ -315,8 +346,8 @@ public class FragmentBlindArriving extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
         if (isMoving)
         {
             try { // Save time, if user quited from app.
