@@ -94,7 +94,7 @@ public class FragmentBlindArriving extends Fragment {
 
             state.setText(getString(R.string.state) +" "+
                     getString(R.string.robot) +" "+  direction +" "+
-                    getString(R.string.on) +" "+ meters +" "+ getString(R.string.meters));
+                    getString(R.string.on) +" "+ meters +" "+ getString(R.string.meters) + " (" + delay/1000/3600 + ":" + delay/1000/60 + ")");
             state.startAnimation(fadeOut_state);
 
             handler.postDelayed(new Runnable() { // Delaying independently number of meters.
@@ -319,19 +319,15 @@ public class FragmentBlindArriving extends Fragment {
                         switch (fileStream.ReadFile(getActivity().openFileInput(DIRECTION_FILE)))
                         {
                             case "forward":
-                                Log.d("123456", "asdzxc");
                                 Move(getString(R.string.moveForward), moveForward, meters, currentDelay);
                                 break;
                             case "left":
-                                Log.d("123456", "asdzxc");
                                 Move(getString(R.string.moveLeft), moveLeft, meters, currentDelay);
                                 break;
                             case "right":
-                                Log.d("123456", "asdzxc");
                                 Move(getString(R.string.moveRight), moveRight, meters, currentDelay);
                                 break;
                             case "back":
-                                Log.d("123456", "asdzxc");
                                 Move(getString(R.string.moveBack), moveBack, meters, currentDelay);
                                 break;
                         }
