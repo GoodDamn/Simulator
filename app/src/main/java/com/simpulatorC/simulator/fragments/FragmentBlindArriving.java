@@ -1,6 +1,7 @@
 package com.simpulatorC.simulator.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -12,21 +13,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.ListAdapter;
 
 import com.simpulatorC.simulator.FileStream;
 import com.simpulatorC.simulator.R;
+import com.simpulatorC.simulator.activities.ActivitySupport;
 
-import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class FragmentBlindArriving extends Fragment {
 
@@ -45,11 +52,25 @@ public class FragmentBlindArriving extends Fragment {
     private boolean isMoving = false;
     private Drawable generalDrawable;
     private ImageButton selectedDirection;
+    private ListView stack_of_commands;
+    private ArrayAdapter<String> adapter_commands;
 
     private void ShowToastMessage(String text) { Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();}
 
+    private void ChangeState(String stateName, int meters, String direction)
+    {
+        FileStream fileStream = new FileStream();
+        try
+        {
+            fileStream.SaveFile(stateName, getActivity().openFileOutput(STATE_FILE, Context.MODE_PRIVATE)); // Save state
+            fileStream.SaveFile(String.valueOf(meters),getActivity().openFileOutput(METERS_FILE, Context.MODE_PRIVATE)); // Save distance
+            fileStream.SaveFile(direction, getActivity().openFileOutput(DIRECTION_FILE, Context.MODE_PRIVATE)); // Save direction of moving
+        } catch (FileNotFoundException e) { e.printStackTrace(); }
+    }
+
     private void ReturnToGeneralState() // When handler is posted delayed.
     {
+        ChangeState("",0,"nowhere");
         handler.removeCallbacksAndMessages(null);
         handler = null;
         isMoving = false;
@@ -57,7 +78,12 @@ public class FragmentBlindArriving extends Fragment {
         state.setText(getString(R.string.state));
         selectedDirection.setBackgroundResource(R.drawable.style_button_rounded_black);
         selectedDirection.setImageDrawable(generalDrawable);
-        ShowToastMessage(getString(R.string.cancelled));
+        if (!adapter_commands.isEmpty())
+        {
+            String nextCommand = adapter_commands.getItem(0);
+            ExecuteCommand(nextCommand);
+            adapter_commands.remove(nextCommand);
+        }
     }
 
     private Drawable getDrawable(int id) { // Method, which return picture from project's resources.
@@ -79,22 +105,15 @@ public class FragmentBlindArriving extends Fragment {
             generalDrawable = button.getDrawable();
             // True, if robot isn't moving.
             isMoving = true;
-            // Save state
-            FileStream fileStream = new FileStream();
-            try
-            {
-                fileStream.SaveFile("Move", getActivity().openFileOutput(STATE_FILE, Context.MODE_PRIVATE)); // Save state
-                fileStream.SaveFile(String.valueOf(meters),getActivity().openFileOutput(METERS_FILE, Context.MODE_PRIVATE)); // Save distance
-                fileStream.SaveFile(direction, getActivity().openFileOutput(DIRECTION_FILE, Context.MODE_PRIVATE)); // Save direction of moving
-            } catch (FileNotFoundException e) { e.printStackTrace(); }
-
+            // Change and save state
+            ChangeState("Move", meters, direction);
             selectedDirection = button;
             selectedDirection.setImageResource(R.drawable.ic_cancel_execution);
             selectedDirection.setBackgroundResource(R.drawable.moving_active);
 
             state.setText(getString(R.string.state) +" "+
                     getString(R.string.robot) +" "+  direction +" "+
-                    getString(R.string.on) +" "+ meters +" "+ getString(R.string.meters) + " (" + delay/1000/3600 + ":" + delay/1000/60 + ")");
+                    getString(R.string.on) +" "+ meters +" "+ getString(R.string.meters) + " (" + delay/1000/3600 + "h : " + delay/1000/60%60 + "m)");
             state.startAnimation(fadeOut_state);
 
             handler.postDelayed(new Runnable() { // Delaying independently number of meters.
@@ -145,14 +164,12 @@ public class FragmentBlindArriving extends Fragment {
         return com;
     }
 
-    private void ExecuteCommand() //Method, which execute command from command line
+    private void ExecuteCommand(String command) //Method, which execute command from command line
     {
         // String to lower case and remove whitespaces.
-        String command = commandLine.getText().toString().toLowerCase().replaceAll("\\s+", "");
         int numSteps = 0;
-        if ( (command.indexOf("moveforward") != -1) || (command.indexOf("moveback") != -1) ||
-                (command.indexOf("moveright") != -1) || (command.indexOf("moveleft") != -1))
-        {
+        if ((command.indexOf("moveforward") != -1) || (command.indexOf("moveback") != -1) ||
+                (command.indexOf("moveright") != -1) || (command.indexOf("moveleft") != -1)) {
             numSteps = getNumberFromCommand(command);
             command = getCommand(command);
         }
@@ -162,22 +179,30 @@ public class FragmentBlindArriving extends Fragment {
                 command = "Flashlights have been turned on";
                 TurnOnOffFlashlight(Color.BLACK, getString(R.string.turn_on_flashlights),
                         R.drawable.style_button_rounded_yellow);
-                break;
-            case "turnoffflashlights": // Turn off flashlights
-                command = "Flashlights have been turned off";
-                TurnOnOffFlashlight(Color.WHITE, getString(R.string.turn_off_flashlights),
-                        R.drawable.style_button_rounded_black);
-                break;
-            case "sleep": SleepMode(false, fadeIn_state, getString(R.string.robot_sleep), R.drawable.style_button_rounded_blue); break;
-            case "moveforward": Move(getString(R.string.moveForward), moveForward, numSteps, 750 * numSteps);break; // Move forward
-            case "moveback": Move(getString(R.string.moveBack), moveBack, numSteps, 750 * numSteps);break; // Move back
-            case "moveright": Move(getString(R.string.moveRight), moveRight, numSteps, 750 * numSteps);break; // move right
-            case "moveleft": Move(getString(R.string.moveLeft), moveLeft, numSteps, 750 * numSteps);break; // move left
+                break; case "turnoffflashlights": // Turn off flashlights
+            command = "Flashlights have been turned off";
+            TurnOnOffFlashlight(Color.WHITE, getString(R.string.turn_off_flashlights),
+                    R.drawable.style_button_rounded_black);
+            break;
+            case "sleep":
+                SleepMode(false, fadeIn_state, getString(R.string.robot_sleep), R.drawable.style_button_rounded_blue);
+                break; case "moveforward": Move(getString(R.string.moveForward), moveForward, numSteps, 750 * numSteps);
+                break; // Move forward
+            case "moveback":
+                Move(getString(R.string.moveBack), moveBack, numSteps, 750 * numSteps);
+                break; // Move back
+            case "moveright":
+                Move(getString(R.string.moveRight), moveRight, numSteps, 750 * numSteps);
+                break; // move right
+            case "moveleft":
+                Move(getString(R.string.moveLeft), moveLeft, numSteps, 750 * numSteps);
+                break; // move left
             default: // If user typed other command.
                 command = getString(R.string.dont_find_command);
                 break;
         }
         Toast.makeText(getContext(), command, Toast.LENGTH_SHORT).show(); // Show message to user.
+
     }
 
     @Nullable @Override
@@ -190,6 +215,8 @@ public class FragmentBlindArriving extends Fragment {
         moveForward = v.findViewById(R.id.Ibutton_move_forward); // Find button with upward arrow
         moveLeft = v.findViewById(R.id.Ibutton_move_Left); // Find button with left arrow
         moveRight = v.findViewById(R.id.Ibutton_move_right); // Find button with right arrow
+        stack_of_commands = v.findViewById(R.id.listView_stack_of_commands); // Find ListView
+        adapter_commands = new ArrayAdapter<>(getContext(), R.layout.support_simple_spinner_dropdown_item);
 
         fadeIn_state = AnimationUtils.loadAnimation(getContext(),R.anim.fadein); // Initialize fade in animation for state
         fadeOut_state = AnimationUtils.loadAnimation(getContext(), R.anim.fadeout); // Initialize fade out animation for state
@@ -238,6 +265,18 @@ public class FragmentBlindArriving extends Fragment {
             }
         });
 
+        ImageView imageView = v.findViewById(R.id.ImageView_commands);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getContext(), ActivitySupport.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                getActivity().finish();
+                getActivity().overridePendingTransition(R.anim.enter_from_top_to_bottom, R.anim.exit_from_top_to_bottom);
+                startActivity(intent);
+            }
+        });
+
         moveForward.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {
                 if (moveForward.getBackground().getConstantState().equals(getDrawable(R.drawable.moving_active).getConstantState()))
@@ -271,7 +310,13 @@ public class FragmentBlindArriving extends Fragment {
         commandLine.setOnEditorActionListener(new TextView.OnEditorActionListener() { // Action, when user clicked "Enter" on soft keyboard.
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                ExecuteCommand();
+                String command = commandLine.getText().toString().toLowerCase().replaceAll("\\s+", "");
+                if (isMoving)
+                {
+                    adapter_commands.add(command);
+                    stack_of_commands.setAdapter(adapter_commands);
+                }
+                else ExecuteCommand(command);
                 return false;
             }
         });
@@ -341,9 +386,9 @@ public class FragmentBlindArriving extends Fragment {
         return v;
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
+
+    public void SaveState()
+    {
         if (isMoving)
         {
             try { // Save time, if user quited from app.
@@ -353,4 +398,5 @@ public class FragmentBlindArriving extends Fragment {
             }
         }
     }
+
 }

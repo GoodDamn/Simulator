@@ -3,9 +3,12 @@ package com.simpulatorC.simulator.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -19,6 +22,9 @@ import com.simpulatorC.simulator.fragments.FragmentBlindArriving;
 import com.simpulatorC.simulator.fragments.FragmentCamera;
 
 public class MainActivity extends AppCompatActivity {
+
+    private ViewPager viewPager;
+    private FragmentPagerAdapter fragmentPagerAdapter;
 
     private void HideKeyboard() // Method, which hide soft keyboard.
     {
@@ -36,11 +42,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final ViewPager viewPager = findViewById(R.id.fragment_container); // Find view pager on layout.
+
+        viewPager = findViewById(R.id.fragment_container); // Find view pager on layout.
         final BottomNavigationView bottomNavigationView = findViewById(R.id.nav_botBar); // Find Bottom navigation bar on layout.
 
-        viewPager.setAdapter(new FragmentAdapterMain(getSupportFragmentManager())); // Set Fragments for view pager
-        viewPager.setCurrentItem(0); // Set "Visual Odometry" page. (Default)
+        fragmentPagerAdapter = new FragmentAdapterMain(getSupportFragmentManager());
+        viewPager.setAdapter(fragmentPagerAdapter); // Set Fragments for view pager
+
+        try
+        {
+            if(getIntent().getStringExtra("page").equals("1"))
+            {
+                viewPager.setCurrentItem(1);
+                bottomNavigationView.setSelectedItemId(R.id.nav_blind_arriving);
+            }
+            else viewPager.setCurrentItem(0);
+        } catch (Exception ignored) { viewPager.setCurrentItem(0);}
 
         viewPager.setOnTouchListener(new View.OnTouchListener() { // Listen, when user touched down.
             @Override
@@ -80,6 +97,17 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
 
+    @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+        if (viewPager.getCurrentItem() != 0) ((FragmentBlindArriving) fragmentPagerAdapter.getItem(viewPager.getCurrentItem())).SaveState();
+    }
+
+    @Override
+    protected void onStop() { // Save current state
+        super.onStop();
+        if (viewPager.getCurrentItem() != 0) ((FragmentBlindArriving) fragmentPagerAdapter.getItem(viewPager.getCurrentItem())).SaveState();
     }
 }

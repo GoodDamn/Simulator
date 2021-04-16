@@ -20,4 +20,11 @@
     <string name="sleep">Robot is sleeping</string>
     <string name="robot_sleep">Robot is sleeping</string>
     <string name="cancelled">Cancelled</string>
+    <string name="list_of_commands">List of commands \n (Where 200, you can use different integer number)</string>
+    <string name="info_moveForward">\"move forward 200\" - Robot move forward on 200 meters.</string>
+    <string name="info_moveBack">\"move back 200\" - Robot move back on 200 meters.</string>
+    <string name="info_moveRight">\"move right 200\" - Robot move right on 200 meters.</string>
+    <string name="info_moveLeft">\"move left 200\" - Robot move left on 200 meters.</string>
+    <string name="info_sleep">\"sleep\" - Enable sleep mode for robot.</string>
+    <string name="info_flashlights">\"turn on/off flashlights\" - turn on/off flashlights</string>
 </resources>

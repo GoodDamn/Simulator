@@ -123,6 +123,14 @@
                 android:background="@drawable/style_button_rounded_black"
                 app:layout_constraintTop_toBottomOf="@+id/edittext_commandLine"
                 tools:layout_editor_absoluteX="0dp" />
+
+            <ListView
+                android:id="@+id/listView_stack_of_commands"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                app:layout_constraintTop_toBottomOf="@+id/Ibutton_sleepMode"
+                android:layout_marginTop="15dp"
+                android:background="@color/back_colour"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </RelativeLayout>
