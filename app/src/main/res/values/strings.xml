@@ -27,4 +27,8 @@
     <string name="info_moveLeft">\"move left 200\" - Robot move left on 200 meters.</string>
     <string name="info_sleep">\"sleep\" - Enable sleep mode for robot.</string>
     <string name="info_flashlights">\"turn on/off flashlights\" - turn on/off flashlights</string>
+    <string name="removeItem">Remove item</string>
+    <string name="removeCommand">Do you want to remove command</string>
+    <string name="cancel">Cancel</string>
+    <string name="ItemRemoved">Removed</string>
 </resources>
