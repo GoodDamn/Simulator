@@ -14,6 +14,10 @@
     <string name="moveBack">back </string>
     <string name="moveRight">right</string>
     <string name="moveLeft">left</string>
+    <string name="moveforward">moveforward</string>
+    <string name="moveback">moveback </string>
+    <string name="moveright">moveright</string>
+    <string name="moveleft">moveleft</string>
     <string name="robot">Robot is moving</string>
     <string name="on">on</string>
     <string name="meters">meters</string>

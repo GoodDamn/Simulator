@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
         viewPager = findViewById(R.id.fragment_container); // Find view pager on layout.
         final BottomNavigationView bottomNavigationView = findViewById(R.id.nav_botBar); // Find Bottom navigation bar on layout.
 

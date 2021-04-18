@@ -9,9 +9,11 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.CalendarContract;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -32,6 +34,8 @@ import androidx.fragment.app.Fragment;
 import com.simpulatorC.simulator.FileStream;
 import com.simpulatorC.simulator.R;
 import com.simpulatorC.simulator.activities.ActivitySupport;
+
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Calendar;
 
@@ -40,8 +44,10 @@ public class FragmentBlindArriving extends Fragment {
     private static String STATE_FILE = "State",
         TIME_FILE = "Time",
         DIRECTION_FILE = "Direction",
+        PREV_DELAY_FILE = "PrevDelay",
+        COMMANDS_FILE = "Commands",
         METERS_FILE = "Meters",
-        COMMANDS_FILE = "Commands";
+        FLASHLIGHTS_FILE = "Flashlight";
 
     private EditText commandLine;
     private Button turnFlashlights;
@@ -49,13 +55,13 @@ public class FragmentBlindArriving extends Fragment {
         moveBack, moveLeft, sleep_mode;
     private TextView state;
     private Animation fadeIn_state, fadeOut_state;
-    private Handler handler;
     private boolean isMoving = false;
     private Drawable generalDrawable;
     private ImageButton selectedDirection;
     private ListView stack_of_commands;
     private ArrayAdapter<String> adapter_commands;
     private long currentDelay;
+    private Thread thread;
 
     private void ShowToastMessage(String text) { Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();}
 
@@ -65,25 +71,37 @@ public class FragmentBlindArriving extends Fragment {
         try
         {
             fileStream.SaveFile(stateName, getActivity().openFileOutput(STATE_FILE, Context.MODE_PRIVATE)); // Save state
-            fileStream.SaveFile(String.valueOf(meters),getActivity().openFileOutput(METERS_FILE, Context.MODE_PRIVATE)); // Save distance
+            fileStream.SaveFile(String.valueOf(currentDelay),getActivity().openFileOutput(PREV_DELAY_FILE, Context.MODE_PRIVATE)); // Save distance
+            fileStream.SaveFile(String.valueOf(meters), getActivity().openFileOutput(METERS_FILE, Context.MODE_PRIVATE));
             fileStream.SaveFile(direction, getActivity().openFileOutput(DIRECTION_FILE, Context.MODE_PRIVATE)); // Save direction of moving
         } catch (FileNotFoundException e) { e.printStackTrace(); }
     }
 
     private void ReturnToGeneralState() // When handler is posted delayed.
     {
+        if(thread != null) thread.interrupt(); // Close thread
         currentDelay = 0;
         ChangeState("",0,"nowhere");
         isMoving = false;
         state.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fadein));
-        state.setText(getString(R.string.state));
+        state.post(new Runnable() {
+            @Override
+            public void run() {
+                state.setText(getString(R.string.state));
+            }
+        });
         selectedDirection.setBackgroundResource(R.drawable.style_button_rounded_black);
         selectedDirection.setImageDrawable(generalDrawable);
         if (!adapter_commands.isEmpty())
         {
-            String nextCommand = adapter_commands.getItem(0);
+            final String nextCommand = adapter_commands.getItem(0);
             ExecuteCommand(nextCommand);
-            adapter_commands.remove(nextCommand);
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    adapter_commands.remove(nextCommand);
+                }
+            });
         }
     }
 
@@ -91,8 +109,11 @@ public class FragmentBlindArriving extends Fragment {
         return getResources().getDrawable(id);
     }
 
-    private void TurnOnOffFlashlight(int textColour, String text, int drawableId) // Method, which enable/disable flashlights
+    private void TurnOnOffFlashlight(String state,int textColour, String text, int drawableId) // Method, which enable/disable flashlights
     {
+        try { // Save state of flashlights (on/off)
+            new FileStream().SaveFile(state, getActivity().openFileOutput(FLASHLIGHTS_FILE, Context.MODE_PRIVATE));
+        } catch (FileNotFoundException e) { e.printStackTrace(); }
         turnFlashlights.setBackgroundResource(drawableId);
         turnFlashlights.setText(text);
         turnFlashlights.setTextColor(textColour);
@@ -102,7 +123,7 @@ public class FragmentBlindArriving extends Fragment {
     {
         if (!isMoving)
         {
-            handler = new Handler();
+            Log.d("123456", " " + meters + " " + delay);
             generalDrawable = button.getDrawable();
             // True, if robot isn't moving.
             isMoving = true;
@@ -116,33 +137,35 @@ public class FragmentBlindArriving extends Fragment {
 
             currentDelay = delay;
 
-            final Thread thread = new Thread(new Runnable() {
+            thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    for(long i = currentDelay; i >= 0; i-=1)
+                    while (currentDelay > 0)
                     {
-                        if (currentDelay != 0)
+                        try
                         {
-                            try { Thread.sleep(1); }
-                            catch (InterruptedException e) { e.printStackTrace(); }
-                            final long finalI = i;
+                            Thread.sleep(1);
                             state.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Log.d("123456", String.valueOf(finalI));
-                                    if (finalI != 0 && currentDelay != 0)
-                                    {
+                                    long hours = currentDelay / 1000 / 3600,
+                                            minutes = currentDelay / 1000/ 60 % 60,
+                                            seconds = ((currentDelay/1000) - (hours * minutes * 60)) % 60;
+                                    try {
                                         state.setText(getString(R.string.state) + " " +
                                                 getString(R.string.robot) + " " + direction + " " +
                                                 getString(R.string.on) + " " + meters + " " +
-                                                getString(R.string.meters) + " (" + finalI / 1000 / 3600 + "h : " + finalI / 1000 / 60 % 60 + "m)");
-                                        currentDelay = finalI;
-                                    }
-                                    else ReturnToGeneralState();
+                                                getString(R.string.meters) + " (" + hours + "h : "
+                                                + minutes + "m : " + seconds + "sec.)");
+                                    }catch (Exception ignored) {}
+                                    currentDelay--;
                                 }
                             });
-                        } else break;
+                        }
+                        catch (InterruptedException e)
+                        { e.printStackTrace(); }
                     }
+                    ReturnToGeneralState();
                 }
             });
 
@@ -189,45 +212,85 @@ public class FragmentBlindArriving extends Fragment {
         return com;
     }
 
+    private void PincersActions(ImageButton button, MotionEvent motionEvent) // Method, which execute, when user touched
+            // on button with pincer's icon
+    {
+        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN)
+            button.setBackgroundResource(R.drawable.style_button_rounded_pink);
+        else button.setBackgroundResource(R.drawable.style_button_rounded_black);
+    }
+
+    private void SetOnTouchListenerPincers(final ImageButton pincer)
+    {
+        pincer.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                PincersActions(pincer, motionEvent);
+                return false;
+            }
+        });
+    }
+
+    private void SetOnClickListenerMoving(final ImageButton button, final int idStringDirection)
+    {
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override public void onClick(View view) {
+                if (button.getBackground().getConstantState().equals(getDrawable(R.drawable.moving_active).getConstantState()))
+                    ReturnToGeneralState();
+                else Move(getString(idStringDirection), button, 2, 1500);
+            }
+        });
+    }
+
     private void ExecuteCommand(String command) //Method, which execute command from command line
     {
         // String to lower case and remove whitespaces.
         long numSteps = 0;
-        if ((command.indexOf("moveforward") != -1) || (command.indexOf("moveback") != -1) ||
-                (command.indexOf("moveright") != -1) || (command.indexOf("moveleft") != -1)) {
+        if ((command.contains(getString(R.string.moveforward))) || (command.contains(getString(R.string.moveback))) ||
+                (command.contains(getString(R.string.moveright))) || (command.contains(getString(R.string.moveleft)))) {
             numSteps = getNumberFromCommand(command);
             command = getCommand(command);
         }
         switch (command)
         {
+            case "авто":
+            case "auto":
+
+                break;
             case "turnonflashlights": // Turn on flashlights
+            case "вклфары":
                 command = "Flashlights have been turned on";
-                TurnOnOffFlashlight(Color.BLACK, getString(R.string.turn_on_flashlights),
-                        R.drawable.style_button_rounded_yellow);
-                break; case "turnoffflashlights": // Turn off flashlights
-            command = "Flashlights have been turned off";
-            TurnOnOffFlashlight(Color.WHITE, getString(R.string.turn_off_flashlights),
-                    R.drawable.style_button_rounded_black);
+                TurnOnOffFlashlight("on",Color.BLACK, getString(R.string.turn_off_flashlights), R.drawable.style_button_rounded_yellow);
+                break;
+            case "turnoffflashlights": // Turn off flashlights
+            case "выклфары":
+                 command = "Flashlights have been turned off";
+                 TurnOnOffFlashlight("off",Color.WHITE, getString(R.string.turn_on_flashlights), R.drawable.style_button_rounded_black);
             break;
             case "sleep": // Command - Sleep
+            case "спать":
                 SleepMode(false, fadeIn_state, getString(R.string.robot_sleep), R.drawable.style_button_rounded_blue);
-                break; case "moveforward": Move(getString(R.string.moveForward), moveForward, numSteps, 750 * numSteps);
+                break;
+            case "moveforward":
+            case "движениевперёд":
+                Move(getString(R.string.moveForward), moveForward, numSteps, 750 * numSteps);
                 break; // Move forward
             case "moveback":
+            case "движениеназад":
                 Move(getString(R.string.moveBack), moveBack, numSteps, 750 * numSteps);
                 break; // Move back
             case "moveright":
+            case "движениевправо":
                 Move(getString(R.string.moveRight), moveRight, numSteps, 750 * numSteps);
                 break; // move right
             case "moveleft":
+            case "движениевлево":
                 Move(getString(R.string.moveLeft), moveLeft, numSteps, 750 * numSteps);
                 break; // move left
             default: // If user typed other command.
                 command = getString(R.string.dont_find_command);
                 break;
         }
-        Toast.makeText(getContext(), command, Toast.LENGTH_SHORT).show(); // Show message to user.
-
     }
 
     @Nullable @Override
@@ -243,9 +306,24 @@ public class FragmentBlindArriving extends Fragment {
         stack_of_commands = v.findViewById(R.id.listView_stack_of_commands); // Find ListView
         adapter_commands = new ArrayAdapter<>(getContext(), R.layout.list_view_row); // Initialize adapter for listView
 
+        final ImageButton clockwise = v.findViewById(R.id.Ibutton_clockwise),
+                pincer_up = v.findViewById(R.id.Ibutton_pincer_up),
+                pincer_down = v.findViewById(R.id.Ibutton_pincer_down),
+                not_clockwise = v.findViewById(R.id.Ibutton_not_clockwise);
+
+        SetOnClickListenerMoving(moveForward, R.string.moveForward);
+        SetOnClickListenerMoving(moveBack, R.string.moveBack);
+        SetOnClickListenerMoving(moveRight, R.string.moveRight);
+        SetOnClickListenerMoving(moveLeft, R.string.moveLeft);
+
+        SetOnTouchListenerPincers(clockwise);
+        SetOnTouchListenerPincers(pincer_up);
+        SetOnTouchListenerPincers(pincer_down);
+        SetOnTouchListenerPincers(not_clockwise);
+
         stack_of_commands.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) { // Listen, when user clicked on listView's item.
                 DialogRemoveItem dialogRemoveItem = new DialogRemoveItem(adapter_commands.getItem(i), adapter_commands);
                 dialogRemoveItem.show(getFragmentManager(), "dialog");
             }
@@ -311,43 +389,6 @@ public class FragmentBlindArriving extends Fragment {
             }
         });
 
-        // Button "Move Forward"
-        moveForward.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View view) {
-                if (moveForward.getBackground().getConstantState().equals(getDrawable(R.drawable.moving_active).getConstantState()))
-                    ReturnToGeneralState();
-                else if (isMoving) ExecuteCommand("moveforward2");
-                else Move(getString(R.string.moveForward), moveForward, 2, 1500);
-            }
-        });
-
-        // Button "Move back"
-        moveBack.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View view) {
-                if (moveBack.getBackground().getConstantState().equals(getDrawable(R.drawable.moving_active).getConstantState()))
-                    ReturnToGeneralState();
-                else if (isMoving) ExecuteCommand("moveback2");
-                else Move(getString(R.string.moveBack), moveBack, 2,1500);
-            }});
-        // Button "Move right"
-        moveRight.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View view) {
-                if (moveRight.getBackground().getConstantState().equals(getDrawable(R.drawable.moving_active).getConstantState()))
-                    ReturnToGeneralState();
-                else if (isMoving) ExecuteCommand("moveright2");
-                else Move(getString(R.string.moveRight), moveRight, 2,1500);
-            }
-        });
-        // Button "Move left"
-        moveLeft.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View view) {
-                if (moveLeft.getBackground().getConstantState().equals(getDrawable(R.drawable.moving_active).getConstantState()))
-                    ReturnToGeneralState();
-                else if (isMoving) ExecuteCommand("moveleft2");
-                else Move(getString(R.string.moveLeft), moveLeft, 2,1500);
-            }
-        });
-
         commandLine = v.findViewById(R.id.edittext_commandLine); // EditText "Command line"
         commandLine.setOnEditorActionListener(new TextView.OnEditorActionListener() { // Action, when user clicked "Enter" on soft keyboard.
             @Override
@@ -373,15 +414,25 @@ public class FragmentBlindArriving extends Fragment {
                 if (turnFlashlights.getBackground()
                         .getConstantState()
                         .equals(getDrawable(R.drawable.style_button_rounded_black).getConstantState()))
-                    TurnOnOffFlashlight(Color.BLACK, getString(R.string.turn_on_flashlights),
+                    TurnOnOffFlashlight("on",Color.BLACK, getString(R.string.turn_off_flashlights),
                             R.drawable.style_button_rounded_yellow); // Change state of button on "Turn on"
-                else TurnOnOffFlashlight(Color.WHITE, getString(R.string.turn_off_flashlights),
+                else TurnOnOffFlashlight("off",Color.WHITE, getString(R.string.turn_on_flashlights),
                         R.drawable.style_button_rounded_black); // Change state of button on "Turn off"
 
             }
         });
 
         // Load current state from text file from device storage.
+        FileStream fileStream = new FileStream();
+
+        // Check flashlights state
+        try
+        {
+            if ("on".equals(fileStream.ReadFile(getActivity().openFileInput(FLASHLIGHTS_FILE))))
+                TurnOnOffFlashlight("on", Color.BLACK, getString(R.string.turn_off_flashlights), R.drawable.style_button_rounded_yellow);
+        } catch (FileNotFoundException e) { e.printStackTrace(); }
+
+        // Check main state (move/sleep)
         String text = null;
         try {
             text = new FileStream().ReadFile(getActivity().openFileInput(STATE_FILE));
@@ -398,7 +449,6 @@ public class FragmentBlindArriving extends Fragment {
                 case "Move": // If robot was moving last time.
                     try
                     {
-                        FileStream fileStream = new FileStream();
                         String commands = fileStream.ReadFile(getActivity().openFileInput(COMMANDS_FILE)), // Open file with saving commands.
                             com = "";
                         for (char ch : commands.toCharArray()) // Analyze data from file.
@@ -413,23 +463,26 @@ public class FragmentBlindArriving extends Fragment {
                         stack_of_commands.setAdapter(adapter_commands); // Show commands in listView.
                         long previousTime = Long.parseLong(fileStream.ReadFile(getActivity().openFileInput(TIME_FILE))),
                             currentTime = Calendar.getInstance().getTimeInMillis();
-                        int meters = Integer.parseInt(fileStream.ReadFile(getActivity().openFileInput(METERS_FILE)));
-                        long currentDelay = 750 * meters - (currentTime - previousTime);
-                        switch (fileStream.ReadFile(getActivity().openFileInput(DIRECTION_FILE)))
+                        long prevDelay = Long.parseLong(fileStream.ReadFile(getActivity().openFileInput(PREV_DELAY_FILE))),
+                            meters = Long.parseLong(fileStream.ReadFile(getActivity().openFileInput(METERS_FILE)));
+                        long delay = prevDelay - (currentTime - previousTime);
+                        if (delay > 0)
                         {
-                            case "forward":
-                                Move(getString(R.string.moveForward), moveForward, meters, currentDelay);
-                                break;
-                            case "left":
-                                Move(getString(R.string.moveLeft), moveLeft, meters, currentDelay);
-                                break;
-                            case "right":
-                                Move(getString(R.string.moveRight), moveRight, meters, currentDelay);
-                                break;
-                            case "back":
-                                Move(getString(R.string.moveBack), moveBack, meters, currentDelay);
-                                break;
-                        }
+                            switch (fileStream.ReadFile(getActivity().openFileInput(DIRECTION_FILE))) {
+                                case "forward":
+                                    Move(getString(R.string.moveForward), moveForward, meters, delay);
+                                    break;
+                                case "left":
+                                    Move(getString(R.string.moveLeft), moveLeft, meters, delay);
+                                    break;
+                                case "right":
+                                    Move(getString(R.string.moveRight), moveRight, meters, delay);
+                                    break;
+                                case "back":
+                                    Move(getString(R.string.moveBack), moveBack, meters, delay);
+                                    break;
+                            }
+                        } else Move("forward", moveForward,0,0);
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
@@ -448,6 +501,7 @@ public class FragmentBlindArriving extends Fragment {
             FileStream fileStream = new FileStream();
             try { // Save time and stack of commands, if user quited from app.
                 fileStream.SaveFile(String.valueOf(Calendar.getInstance().getTimeInMillis()), getActivity().openFileOutput(TIME_FILE, Context.MODE_PRIVATE));
+                fileStream.SaveFile(String.valueOf(currentDelay), getActivity().openFileOutput(PREV_DELAY_FILE, Context.MODE_PRIVATE));
                 String strCommands = "";
                 for (int i = 0; i < adapter_commands.getCount(); i++)
                 {
@@ -455,6 +509,7 @@ public class FragmentBlindArriving extends Fragment {
                     strCommands += " ";
                 }
                 Log.d("123456", strCommands);
+                Log.d("123456", "Saved Time " + Calendar.getInstance().getTimeInMillis() + " CurrentDelay " + currentDelay);
                 fileStream.SaveFile(strCommands, getActivity().openFileOutput(COMMANDS_FILE, Context.MODE_PRIVATE));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
