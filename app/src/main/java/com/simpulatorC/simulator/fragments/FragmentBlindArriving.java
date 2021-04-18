@@ -29,11 +29,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDialogFragment;
 import androidx.fragment.app.Fragment;
-
 import com.simpulatorC.simulator.FileStream;
 import com.simpulatorC.simulator.R;
 import com.simpulatorC.simulator.activities.ActivitySupport;
-
 import java.io.FileNotFoundException;
 import java.util.Calendar;
 
@@ -57,6 +55,7 @@ public class FragmentBlindArriving extends Fragment {
     private ImageButton selectedDirection;
     private ListView stack_of_commands;
     private ArrayAdapter<String> adapter_commands;
+    private long currentDelay;
 
     private void ShowToastMessage(String text) { Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();}
 
@@ -73,9 +72,8 @@ public class FragmentBlindArriving extends Fragment {
 
     private void ReturnToGeneralState() // When handler is posted delayed.
     {
+        currentDelay = 0;
         ChangeState("",0,"nowhere");
-        handler.removeCallbacksAndMessages(null);
-        handler = null;
         isMoving = false;
         state.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fadein));
         state.setText(getString(R.string.state));
@@ -100,7 +98,7 @@ public class FragmentBlindArriving extends Fragment {
         turnFlashlights.setTextColor(textColour);
     }
 
-    private void Move(String direction, final ImageButton button, long meters, long delay) // MOVE
+    private void Move(final String direction, final ImageButton button, final long meters, final long delay) // MOVE
     {
         if (!isMoving)
         {
@@ -114,17 +112,41 @@ public class FragmentBlindArriving extends Fragment {
             selectedDirection.setImageResource(R.drawable.ic_cancel_execution);
             selectedDirection.setBackgroundResource(R.drawable.moving_active);
 
-            state.setText(getString(R.string.state) +" "+
-                    getString(R.string.robot) +" "+  direction +" "+
-                    getString(R.string.on) +" "+ meters +" "+ getString(R.string.meters) + " (" + delay/1000/3600 + "h : " + delay/1000/60%60 + "m)");
             state.startAnimation(fadeOut_state);
 
-            handler.postDelayed(new Runnable() { // Delaying independently number of meters.
+            currentDelay = delay;
+
+            final Thread thread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    ReturnToGeneralState();
+                    for(long i = currentDelay; i >= 0; i-=1)
+                    {
+                        if (currentDelay != 0)
+                        {
+                            try { Thread.sleep(1); }
+                            catch (InterruptedException e) { e.printStackTrace(); }
+                            final long finalI = i;
+                            state.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Log.d("123456", String.valueOf(finalI));
+                                    if (finalI != 0 && currentDelay != 0)
+                                    {
+                                        state.setText(getString(R.string.state) + " " +
+                                                getString(R.string.robot) + " " + direction + " " +
+                                                getString(R.string.on) + " " + meters + " " +
+                                                getString(R.string.meters) + " (" + finalI / 1000 / 3600 + "h : " + finalI / 1000 / 60 % 60 + "m)");
+                                        currentDelay = finalI;
+                                    }
+                                    else ReturnToGeneralState();
+                                }
+                            });
+                        } else break;
+                    }
                 }
-            }, delay);// Delay
+            });
+
+            thread.start();
         }
     }
 
@@ -252,8 +274,7 @@ public class FragmentBlindArriving extends Fragment {
             @Override public void onClick(View view) { // Sleep mode
                 if (sleep_mode.getBackground().getConstantState().equals(getDrawable(R.drawable.style_button_rounded_black).getConstantState()))
                 {
-                    if (handler != null) // Disable postDelayed method, when robot is moving.
-                        ReturnToGeneralState();
+                    if (isMoving) ReturnToGeneralState();
                     // Enable sleep mode
                     SleepMode(false, fadeIn_state, "Robot is sleeping", R.drawable.style_button_rounded_blue);
                     try {
@@ -295,6 +316,7 @@ public class FragmentBlindArriving extends Fragment {
             @Override public void onClick(View view) {
                 if (moveForward.getBackground().getConstantState().equals(getDrawable(R.drawable.moving_active).getConstantState()))
                     ReturnToGeneralState();
+                else if (isMoving) ExecuteCommand("moveforward2");
                 else Move(getString(R.string.moveForward), moveForward, 2, 1500);
             }
         });
@@ -304,6 +326,7 @@ public class FragmentBlindArriving extends Fragment {
             @Override public void onClick(View view) {
                 if (moveBack.getBackground().getConstantState().equals(getDrawable(R.drawable.moving_active).getConstantState()))
                     ReturnToGeneralState();
+                else if (isMoving) ExecuteCommand("moveback2");
                 else Move(getString(R.string.moveBack), moveBack, 2,1500);
             }});
         // Button "Move right"
@@ -311,6 +334,7 @@ public class FragmentBlindArriving extends Fragment {
             @Override public void onClick(View view) {
                 if (moveRight.getBackground().getConstantState().equals(getDrawable(R.drawable.moving_active).getConstantState()))
                     ReturnToGeneralState();
+                else if (isMoving) ExecuteCommand("moveright2");
                 else Move(getString(R.string.moveRight), moveRight, 2,1500);
             }
         });
@@ -319,6 +343,7 @@ public class FragmentBlindArriving extends Fragment {
             @Override public void onClick(View view) {
                 if (moveLeft.getBackground().getConstantState().equals(getDrawable(R.drawable.moving_active).getConstantState()))
                     ReturnToGeneralState();
+                else if (isMoving) ExecuteCommand("moveleft2");
                 else Move(getString(R.string.moveLeft), moveLeft, 2,1500);
             }
         });

@@ -10,4 +10,5 @@
     <color name="icons_nav_bar">#171D2F</color>
     <color name="NavBottomBar_back_colour">#FFFFFF</color>
     <color name="textColour">#2C2642</color>
+    <bool name="navLightBar">true</bool>
 </resources>

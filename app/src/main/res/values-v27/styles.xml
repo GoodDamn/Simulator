@@ -8,6 +8,8 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:navigationBarColor">@color/NavBottomBar_back_colour</item>
         <item name="android:statusBarColor">@color/back_colour</item>
+        <item name="android:windowLightNavigationBar">@bool/navLightBar</item>
+        <item name="android:windowLightStatusBar">@bool/navLightBar</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
     </style>
 </resources>
