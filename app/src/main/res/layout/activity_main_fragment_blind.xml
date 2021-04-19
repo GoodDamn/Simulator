@@ -9,7 +9,7 @@
 
     <ScrollView
         android:scrollbars="none"
-        android:overScrollMode="never"
+        android:overScrollMode="ifContentScrolls"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/back_colour">
@@ -155,7 +155,7 @@
                 android:layout_marginStart="200dp"
                 android:layout_marginEnd="35dp"
                 android:background="@drawable/style_button_rounded_black"
-                android:src="@drawable/pincer_up"
+                android:src="@drawable/pincer_down"
                 app:layout_constraintTop_toBottomOf="@+id/Ibutton_clockwise" />
 
             <Button
@@ -173,6 +173,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/Ibutton_sleepMode" />
 
             <ListView
+                android:overScrollMode="ifContentScrolls"
                 android:id="@+id/listView_stack_of_commands"
                 android:layout_width="match_parent"
                 android:layout_height="240dp"

@@ -1,5 +1,6 @@
 package com.simpulatorC.simulator.fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -50,8 +51,6 @@ public class FragmentBlindArriving extends Fragment {
         METERS_FILE = "Meters",
         FLASHLIGHTS_FILE = "Flashlight",
         AUTO_FILE = "AutoState";
-
-    private String[] moves;
 
     private EditText commandLine;
     private Button turnFlashlights;
@@ -212,6 +211,7 @@ public class FragmentBlindArriving extends Fragment {
                 ch == '7' || ch=='8' || ch=='9' || ch=='0')
                 number += ch;
         }
+        if (number.isEmpty()) number = "2";
         return Long.parseLong(number);
     }
 
@@ -251,9 +251,14 @@ public class FragmentBlindArriving extends Fragment {
     {
         button.setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View view) {
-                if (button.getBackground().getConstantState().equals(getDrawable(R.drawable.moving_active).getConstantState()))
-                    ReturnToGeneralState();
-                else Move(getString(idStringDirection), button, 2, 1500);
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (button.getBackground().getConstantState().equals(getDrawable(R.drawable.moving_active).getConstantState()))
+                            ReturnToGeneralState();
+                        else Move(getString(idStringDirection), button, 2, 1500);
+                    }
+                });
             }
         });
     }
@@ -271,13 +276,6 @@ public class FragmentBlindArriving extends Fragment {
             case "автовкл": case "autoon": // Auto mode is enabled
                 isAutoMode = true;
                 UIState(false);
-                Random random = new Random();
-                for (int i = 0; i < random.nextInt(10) + 1; i++)
-                {
-                    String text = moves[random.nextInt(4)] + random.nextInt(5000);
-                    if (isMoving) adapter_commands.add(text);
-                    else ExecuteCommand(text);
-                }
                 SaveState();
                 StartAutoMode();
                 break;
@@ -295,18 +293,18 @@ public class FragmentBlindArriving extends Fragment {
                  TurnOnOffFlashlight("off",Color.WHITE, getString(R.string.turn_on_flashlights), R.drawable.style_button_rounded_black);
             break;
             case "sleep": case "спать": // Command - Sleep
-                SleepMode(false, fadeIn_state, getString(R.string.robot_sleep), R.drawable.style_button_rounded_blue);
+                SleepMode(false, fadeIn_state, getString(R.string.sleep), R.drawable.style_button_rounded_blue);
             break;
-            case "moveforward": case "движениевперёд":
+            case "moveforward": case "двигвперёд":
                 Move(getString(R.string.moveForward), moveForward, numSteps, 750 * numSteps);
             break; // Move forward
-            case "moveback": case "движениеназад":
+            case "moveback": case "двигназад":
                 Move(getString(R.string.moveBack), moveBack, numSteps, 750 * numSteps);
             break; // Move back
-            case "moveright": case "движениевправо":
+            case "moveright": case "двигвправо":
                 Move(getString(R.string.moveRight), moveRight, numSteps, 750 * numSteps);
                 break; // move right
-            case "moveleft": case "движениевлево":
+            case "moveleft": case "двигвлево":
                 Move(getString(R.string.moveLeft), moveLeft, numSteps, 750 * numSteps);
             break; // move left
             default: // If user typed other command.
@@ -328,12 +326,6 @@ public class FragmentBlindArriving extends Fragment {
         stack_of_commands = v.findViewById(R.id.listView_stack_of_commands); // Find ListView
         adapter_commands = new ArrayAdapter<>(getContext(), R.layout.list_view_row); // Initialize adapter for listView
 
-        moves = new String[]{
-                getString(R.string.moveforward),
-                getString(R.string.moveright),
-                getString(R.string.moveback),
-                getString(R.string.moveleft)
-        };
 
         clockwise = v.findViewById(R.id.Ibutton_clockwise);
         pincer_up = v.findViewById(R.id.Ibutton_pincer_up);
@@ -383,7 +375,7 @@ public class FragmentBlindArriving extends Fragment {
                 {
                     if (isMoving) ReturnToGeneralState();
                     // Enable sleep mode
-                    SleepMode(false, fadeIn_state, "Robot is sleeping", R.drawable.style_button_rounded_blue);
+                    SleepMode(false, fadeIn_state, getString(R.string.sleep), R.drawable.style_button_rounded_blue);
                     try {
                         new FileStream().SaveFile("Sleep", getActivity().openFileOutput(STATE_FILE, Context.MODE_PRIVATE));
                     } catch (FileNotFoundException e) {
@@ -426,7 +418,8 @@ public class FragmentBlindArriving extends Fragment {
                 String command = commandLine.getText().toString().toLowerCase().replaceAll("\\s+", "");
                 if (isMoving)
                 {
-                    if (command.equals("autooff") || command.equals("autoon"))
+                    if (command.equals("autooff") || command.equals("autoon") ||
+                            command.equals("автовкл") || command.equals("автовыкл"))
                         ExecuteCommand(command);
                     else {
                         adapter_commands.add(command);
@@ -482,8 +475,8 @@ public class FragmentBlindArriving extends Fragment {
         {
             switch (text) // Select current state
             {
-                case "Sleep": // If robot was sleeping last time
-                    SleepMode(false, fadeIn_state, "Robot is sleeping", R.drawable.style_button_rounded_blue);
+                case "Sleep": case "спать": // If robot was sleeping last time
+                    SleepMode(false, fadeIn_state, getString(R.string.sleep), R.drawable.style_button_rounded_blue);
                     break;
                 case "Move": // If robot was moving last time.
                     try
@@ -508,16 +501,16 @@ public class FragmentBlindArriving extends Fragment {
                         if (delay > 0)
                         {
                             switch (fileStream.ReadFile(getActivity().openFileInput(DIRECTION_FILE))) {
-                                case "forward":
+                                case "forward": case "вперёд":
                                     Move(getString(R.string.moveForward), moveForward, meters, delay);
                                     break;
-                                case "left":
+                                case "left": case "влево":
                                     Move(getString(R.string.moveLeft), moveLeft, meters, delay);
                                     break;
-                                case "right":
+                                case "right": case "вправо":
                                     Move(getString(R.string.moveRight), moveRight, meters, delay);
                                     break;
-                                case "back":
+                                case "back": case "назад":
                                     Move(getString(R.string.moveBack), moveBack, meters, delay);
                                     break;
                             }
@@ -539,6 +532,21 @@ public class FragmentBlindArriving extends Fragment {
 
     private void StartAutoMode()
     {
+
+        final String[] moves = new String[]{
+                getString(R.string.moveforward),
+                getString(R.string.moveright),
+                getString(R.string.moveback),
+                getString(R.string.moveleft)
+        };
+
+        final ImageButton[] pincers = new ImageButton[]{
+               pincer_up,
+               pincer_down,
+               clockwise,
+               not_clockwise
+        };
+
         final Random random = new Random();
         final Thread thread = new Thread(new Runnable() {
             @Override
@@ -547,19 +555,21 @@ public class FragmentBlindArriving extends Fragment {
                 {
                     try
                     {
-                        if (isAutoMode)
+                        if (adapter_commands.getCount() <= 12)
                         {
-                            if (adapter_commands.getCount() <= 12)
+                            Activity activity = getActivity();
+                            if (activity != null)
                             {
-                                getActivity().runOnUiThread(new Runnable() {
-                                    @Override public void run()
-                                    {
+                                activity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
                                         final String text = moves[random.nextInt(4)] + random.nextInt(5000);
                                         if (isMoving) adapter_commands.add(text);
                                         else ExecuteCommand(text);
 
-                                        if (random.nextBoolean()) TurnOnOffFlashlight("on", Color.BLACK,
-                                                getString(R.string.turn_on_flashlights), R.drawable.style_button_rounded_yellow);
+                                        if (random.nextBoolean())
+                                            TurnOnOffFlashlight("on", Color.BLACK,
+                                                    getString(R.string.turn_on_flashlights), R.drawable.style_button_rounded_yellow);
                                         else TurnOnOffFlashlight("off", Color.WHITE,
                                                 getString(R.string.turn_off_flashlights), R.drawable.style_button_rounded_black);
                                     }
@@ -571,7 +581,38 @@ public class FragmentBlindArriving extends Fragment {
                 }
             }
         });
+
+        Thread thread_pincers = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (isAutoMode)
+                {
+                    try
+                    {
+                        Activity activity = getActivity();
+                        if (activity != null)
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (random.nextBoolean()) {
+                                        int i = random.nextInt(4);
+                                        if (pincers[i].getBackground().getConstantState().equals(getDrawable(R.drawable.style_button_rounded_black).getConstantState()))
+                                            pincers[i].setBackgroundResource(R.drawable.style_button_rounded_pink);
+                                        else
+                                            pincers[i].setBackgroundResource(R.drawable.style_button_rounded_black);
+                                    }
+                                }
+                            });
+                            Thread.sleep(random.nextInt(3500));
+
+                    } catch (InterruptedException e) { e.printStackTrace(); }
+                }
+            }
+        });
+
         thread.start();
+        thread_pincers.start();
+
     }
 
     public void SaveState() // Method, which save current state of robot in files.

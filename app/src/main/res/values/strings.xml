@@ -22,7 +22,6 @@
     <string name="on">on</string>
     <string name="meters">meters</string>
     <string name="sleep">Mars Rover is sleeping</string>
-    <string name="robot_sleep">Mars Rover is sleeping</string>
     <string name="cancelled">Cancelled</string>
     <string name="list_of_commands">List of commands \n (Where 200, you can use different integer number)</string>
     <string name="info_moveForward">\"move forward 200\" - Mars Rover move forward on 200 meters.</string>
@@ -30,9 +29,10 @@
     <string name="info_moveRight">\"move right 200\" - Mars Rover move right on 200 meters.</string>
     <string name="info_moveLeft">\"move left 200\" - Mars Rover move left on 200 meters.</string>
     <string name="info_sleep">\"sleep\" - Enable sleep mode for Mars Rover.</string>
-    <string name="info_flashlights">\"turn on/off flashlights\" - turn on/off flashlights</string>
+    <string name="info_flashlights">\"turn on/off flashlights\" - turn on/off flashlights.</string>
     <string name="removeItem">Remove item</string>
     <string name="removeCommand">Do you want to remove command</string>
     <string name="cancel">Cancel</string>
     <string name="ItemRemoved">Removed</string>
+    <string name="autoOnOff">\"auto off/on\" - Enable/disable auto mode.</string>
 </resources>
