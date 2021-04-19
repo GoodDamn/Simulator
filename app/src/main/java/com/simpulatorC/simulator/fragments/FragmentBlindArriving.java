@@ -38,6 +38,7 @@ import com.simpulatorC.simulator.activities.ActivitySupport;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Calendar;
+import java.util.Random;
 
 public class FragmentBlindArriving extends Fragment {
 
@@ -47,12 +48,16 @@ public class FragmentBlindArriving extends Fragment {
         PREV_DELAY_FILE = "PrevDelay",
         COMMANDS_FILE = "Commands",
         METERS_FILE = "Meters",
-        FLASHLIGHTS_FILE = "Flashlight";
+        FLASHLIGHTS_FILE = "Flashlight",
+        AUTO_FILE = "AutoState";
+
+    private String[] moves;
 
     private EditText commandLine;
     private Button turnFlashlights;
     private ImageButton moveForward, moveRight,
-        moveBack, moveLeft, sleep_mode;
+        moveBack, moveLeft, sleep_mode, pincer_up, pincer_down,
+        clockwise, not_clockwise;
     private TextView state;
     private Animation fadeIn_state, fadeOut_state;
     private boolean isMoving = false;
@@ -62,6 +67,7 @@ public class FragmentBlindArriving extends Fragment {
     private ArrayAdapter<String> adapter_commands;
     private long currentDelay;
     private Thread thread;
+    private boolean isAutoMode = false;
 
     private void ShowToastMessage(String text) { Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();}
 
@@ -173,17 +179,27 @@ public class FragmentBlindArriving extends Fragment {
         }
     }
 
+    private void UIState(boolean isEnabled)
+    {
+        moveBack.setEnabled(isEnabled);
+        moveForward.setEnabled(isEnabled);
+        moveLeft.setEnabled(isEnabled);
+        moveRight.setEnabled(isEnabled);
+        turnFlashlights.setEnabled(isEnabled);
+        clockwise.setEnabled(isEnabled);
+        not_clockwise.setEnabled(isEnabled);
+        pincer_down.setEnabled(isEnabled);
+        pincer_up.setEnabled(isEnabled);
+        stack_of_commands.setEnabled(isEnabled);
+    }
+
     private void SleepMode(boolean enabled, Animation animation, String textState, int idDrawable) // Method, which disable/enable sleep mode
     {
         sleep_mode.setBackgroundResource(idDrawable);
         state.setText(getString(R.string.state) +" "+ textState);
         state.startAnimation(animation);
         //Disable all components on the screen.
-        moveBack.setEnabled(enabled);
-        moveLeft.setEnabled(enabled);
-        moveRight.setEnabled(enabled);
-        moveForward.setEnabled(enabled);
-        turnFlashlights.setEnabled(enabled);
+        UIState(false);
         commandLine.setEnabled(enabled);
     }
 
@@ -251,45 +267,51 @@ public class FragmentBlindArriving extends Fragment {
             numSteps = getNumberFromCommand(command);
             command = getCommand(command);
         }
-        switch (command)
-        {
-            case "авто":
-            case "auto":
-
+        switch (command) {
+            case "автовкл": case "autoon": // Auto mode is enabled
+                isAutoMode = true;
+                UIState(false);
+                Random random = new Random();
+                for (int i = 0; i < random.nextInt(10) + 1; i++)
+                {
+                    String text = moves[random.nextInt(4)] + random.nextInt(5000);
+                    if (isMoving) adapter_commands.add(text);
+                    else ExecuteCommand(text);
+                }
+                SaveState();
+                StartAutoMode();
                 break;
-            case "turnonflashlights": // Turn on flashlights
-            case "вклфары":
+            case "автовыкл": case "autooff": // Auto mode is disabled
+                isAutoMode = false;
+                UIState(true);
+                SaveState();
+            break;
+            case "turnonflashlights": case "вклфары": // Turn on flashlights
                 command = "Flashlights have been turned on";
                 TurnOnOffFlashlight("on",Color.BLACK, getString(R.string.turn_off_flashlights), R.drawable.style_button_rounded_yellow);
-                break;
-            case "turnoffflashlights": // Turn off flashlights
-            case "выклфары":
+            break;
+            case "turnoffflashlights": case "выклфары": // Turn off flashlights
                  command = "Flashlights have been turned off";
                  TurnOnOffFlashlight("off",Color.WHITE, getString(R.string.turn_on_flashlights), R.drawable.style_button_rounded_black);
             break;
-            case "sleep": // Command - Sleep
-            case "спать":
+            case "sleep": case "спать": // Command - Sleep
                 SleepMode(false, fadeIn_state, getString(R.string.robot_sleep), R.drawable.style_button_rounded_blue);
-                break;
-            case "moveforward":
-            case "движениевперёд":
+            break;
+            case "moveforward": case "движениевперёд":
                 Move(getString(R.string.moveForward), moveForward, numSteps, 750 * numSteps);
-                break; // Move forward
-            case "moveback":
-            case "движениеназад":
+            break; // Move forward
+            case "moveback": case "движениеназад":
                 Move(getString(R.string.moveBack), moveBack, numSteps, 750 * numSteps);
-                break; // Move back
-            case "moveright":
-            case "движениевправо":
+            break; // Move back
+            case "moveright": case "движениевправо":
                 Move(getString(R.string.moveRight), moveRight, numSteps, 750 * numSteps);
                 break; // move right
-            case "moveleft":
-            case "движениевлево":
+            case "moveleft": case "движениевлево":
                 Move(getString(R.string.moveLeft), moveLeft, numSteps, 750 * numSteps);
-                break; // move left
+            break; // move left
             default: // If user typed other command.
                 command = getString(R.string.dont_find_command);
-                break;
+             break;
         }
     }
 
@@ -306,10 +328,17 @@ public class FragmentBlindArriving extends Fragment {
         stack_of_commands = v.findViewById(R.id.listView_stack_of_commands); // Find ListView
         adapter_commands = new ArrayAdapter<>(getContext(), R.layout.list_view_row); // Initialize adapter for listView
 
-        final ImageButton clockwise = v.findViewById(R.id.Ibutton_clockwise),
-                pincer_up = v.findViewById(R.id.Ibutton_pincer_up),
-                pincer_down = v.findViewById(R.id.Ibutton_pincer_down),
-                not_clockwise = v.findViewById(R.id.Ibutton_not_clockwise);
+        moves = new String[]{
+                getString(R.string.moveforward),
+                getString(R.string.moveright),
+                getString(R.string.moveback),
+                getString(R.string.moveleft)
+        };
+
+        clockwise = v.findViewById(R.id.Ibutton_clockwise);
+        pincer_up = v.findViewById(R.id.Ibutton_pincer_up);
+        pincer_down = v.findViewById(R.id.Ibutton_pincer_down);
+        not_clockwise = v.findViewById(R.id.Ibutton_not_clockwise);
 
         SetOnClickListenerMoving(moveForward, R.string.moveForward);
         SetOnClickListenerMoving(moveBack, R.string.moveBack);
@@ -397,8 +426,12 @@ public class FragmentBlindArriving extends Fragment {
                 String command = commandLine.getText().toString().toLowerCase().replaceAll("\\s+", "");
                 if (isMoving)
                 {
-                    adapter_commands.add(command);
-                    stack_of_commands.setAdapter(adapter_commands);
+                    if (command.equals("autooff") || command.equals("autoon"))
+                        ExecuteCommand(command);
+                    else {
+                        adapter_commands.add(command);
+                        stack_of_commands.setAdapter(adapter_commands);
+                    }
                 }
                 else ExecuteCommand(command);
                 return false;
@@ -430,6 +463,12 @@ public class FragmentBlindArriving extends Fragment {
         {
             if ("on".equals(fileStream.ReadFile(getActivity().openFileInput(FLASHLIGHTS_FILE))))
                 TurnOnOffFlashlight("on", Color.BLACK, getString(R.string.turn_off_flashlights), R.drawable.style_button_rounded_yellow);
+        } catch (FileNotFoundException e) { e.printStackTrace(); }
+
+        // Check auto mode (true/false)
+        try {
+            isAutoMode = Boolean.parseBoolean(fileStream.ReadFile(getActivity().openFileInput(AUTO_FILE)));
+            UIState(!isAutoMode);
         } catch (FileNotFoundException e) { e.printStackTrace(); }
 
         // Check main state (move/sleep)
@@ -489,27 +528,67 @@ public class FragmentBlindArriving extends Fragment {
                     break;
             }
         }
-
         return v;
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        StartAutoMode();
+    }
+
+    private void StartAutoMode()
+    {
+        final Random random = new Random();
+        final Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (isAutoMode) // Check auto mode
+                {
+                    try
+                    {
+                        if (isAutoMode)
+                        {
+                            if (adapter_commands.getCount() <= 12)
+                            {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override public void run()
+                                    {
+                                        final String text = moves[random.nextInt(4)] + random.nextInt(5000);
+                                        if (isMoving) adapter_commands.add(text);
+                                        else ExecuteCommand(text);
+
+                                        if (random.nextBoolean()) TurnOnOffFlashlight("on", Color.BLACK,
+                                                getString(R.string.turn_on_flashlights), R.drawable.style_button_rounded_yellow);
+                                        else TurnOnOffFlashlight("off", Color.WHITE,
+                                                getString(R.string.turn_off_flashlights), R.drawable.style_button_rounded_black);
+                                    }
+                                });
+                            }
+                        }
+                        Thread.sleep(random.nextInt(15000));
+                    } catch (InterruptedException e) { e.printStackTrace(); }
+                }
+            }
+        });
+        thread.start();
+    }
 
     public void SaveState() // Method, which save current state of robot in files.
     {
         if (isMoving) // if robot is moving
         {
             FileStream fileStream = new FileStream();
-            try { // Save time and stack of commands, if user quited from app.
+            try { // Save time, stack of commands, autoMode, if user quited from app.
                 fileStream.SaveFile(String.valueOf(Calendar.getInstance().getTimeInMillis()), getActivity().openFileOutput(TIME_FILE, Context.MODE_PRIVATE));
                 fileStream.SaveFile(String.valueOf(currentDelay), getActivity().openFileOutput(PREV_DELAY_FILE, Context.MODE_PRIVATE));
+                fileStream.SaveFile(String.valueOf(isAutoMode), getActivity().openFileOutput(AUTO_FILE, Context.MODE_PRIVATE));
                 String strCommands = "";
                 for (int i = 0; i < adapter_commands.getCount(); i++)
                 {
                     strCommands += adapter_commands.getItem(i);
                     strCommands += " ";
                 }
-                Log.d("123456", strCommands);
-                Log.d("123456", "Saved Time " + Calendar.getInstance().getTimeInMillis() + " CurrentDelay " + currentDelay);
                 fileStream.SaveFile(strCommands, getActivity().openFileOutput(COMMANDS_FILE, Context.MODE_PRIVATE));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
