@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/back_colour">
+
+    <ScrollView
+        android:scrollbars="none"
+        android:overScrollMode="ifContentScrolls"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/back_colour">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/back_colour">
+            <EditText
+                android:id="@+id/edittext_commandLine"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginStart="35dp"
+                android:layout_marginTop="68dp"
+                android:layout_marginEnd="35dp"
+                android:background="@drawable/style_edittext"
+                android:drawableStart="@drawable/style_edittext_drawable"
+                android:fontFamily="@font/rambla"
+                android:gravity="center"
+                android:hint="@string/command_line"
+                android:imeOptions="actionDone"
+                android:paddingStart="25dp"
+                android:paddingEnd="15dp"
+                android:singleLine="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView_state"
+                android:text="@string/state"
+                android:fontFamily="@font/rambla"
+                android:layout_marginHorizontal="40dp"
+                android:layout_marginTop="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                android:textColor="@color/textColour"/>
+
+            <ImageView
+                android:id="@+id/ImageView_commands"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginTop="15dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:background="@drawable/ic_commands"/>
+
+            <ImageButton
+                android:id="@+id/Ibutton_move_forward"
+                android:layout_width="match_parent"
+                android:layout_marginStart="200dp"
+                android:layout_marginEnd="35dp"
+                android:layout_height="45dp"
+                android:layout_marginTop="15dp"
+                android:background="@drawable/style_button_rounded_black"
+                android:src="@drawable/ic_arrow_forward"
+                app:layout_constraintEnd_toEndOf="@+id/edittext_commandLine"
+                app:layout_constraintHorizontal_bias="0.404"
+                app:layout_constraintTop_toBottomOf="@+id/edittext_commandLine" />
+
+            <ImageButton
+                android:id="@+id/Ibutton_move_Left"
+                android:layout_width="match_parent"
+                android:layout_marginStart="200dp"
+                android:layout_marginEnd="100dp"
+                android:layout_height="150dp"
+                android:background="@drawable/style_button_rounded_black"
+                android:src="@drawable/ic_arrow_left"
+                app:layout_constraintStart_toStartOf="@+id/Ibutton_move_forward"
+                app:layout_constraintTop_toBottomOf="@+id/Ibutton_move_forward" />
+
+            <ImageButton
+                android:id="@+id/Ibutton_move_right"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginStart="265dp"
+                android:layout_marginEnd="35dp"
+                android:background="@drawable/style_button_rounded_black"
+                android:src="@drawable/ic_arrow_right"
+                app:layout_constraintEnd_toEndOf="@+id/Ibutton_move_forward"
+                app:layout_constraintTop_toBottomOf="@+id/Ibutton_move_forward" />
+
+            <ImageButton
+                android:id="@+id/Ibutton_move_back"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_marginStart="200dp"
+                android:layout_marginEnd="35dp"
+                android:background="@drawable/style_button_rounded_black"
+                android:src="@drawable/ic_arrow_back"
+                app:layout_constraintEnd_toEndOf="@+id/Ibutton_move_right"
+                app:layout_constraintStart_toStartOf="@+id/Ibutton_move_Left"
+                app:layout_constraintTop_toBottomOf="@+id/Ibutton_move_right" />
+
+            <ImageButton
+                android:id="@+id/Ibutton_sleepMode"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/style_button_rounded_black"
+                app:layout_constraintTop_toBottomOf="@+id/Ibutton_move_back"
+                android:layout_marginTop="25dp"
+                android:layout_marginHorizontal="35dp"
+                android:src="@drawable/moon"/>
+
+            <ImageButton
+                android:id="@+id/Ibutton_pincer_up"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="200dp"
+                android:layout_marginEnd="35dp"
+                android:background="@drawable/style_button_rounded_black"
+                android:src="@drawable/pincer_up"
+                app:layout_constraintTop_toTopOf="@+id/button_turnOnOff_Flashlights" />
+
+            <ImageButton
+                android:id="@+id/Ibutton_not_clockwise"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginStart="200dp"
+                android:layout_marginEnd="100dp"
+                android:background="@drawable/style_button_rounded_black"
+                android:src="@drawable/pincer_not_clockwise"
+                app:layout_constraintStart_toStartOf="@+id/Ibutton_move_forward"
+                app:layout_constraintTop_toBottomOf="@+id/Ibutton_pincer_up" />
+
+            <ImageButton
+                android:id="@+id/Ibutton_clockwise"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"
+                android:layout_marginEnd="35dp"
+                android:layout_marginStart="265dp"
+                android:background="@drawable/style_button_rounded_black"
+                android:src="@drawable/pincer_clockwise"
+                app:layout_constraintEnd_toEndOf="@+id/Ibutton_move_forward"
+                app:layout_constraintTop_toBottomOf="@+id/Ibutton_pincer_up" />
+
+            <ImageButton
+                android:id="@+id/Ibutton_pincer_down"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginStart="200dp"
+                android:layout_marginEnd="35dp"
+                android:background="@drawable/style_button_rounded_black"
+                android:src="@drawable/pincer_down"
+                app:layout_constraintTop_toBottomOf="@+id/Ibutton_clockwise" />
+
+            <Button
+                android:id="@+id/button_turnOnOff_Flashlights"
+                android:layout_width="match_parent"
+                android:layout_height="245dp"
+                android:layout_marginStart="35dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="180dp"
+                android:background="@drawable/style_button_rounded_black"
+                android:fontFamily="@font/rambla"
+                android:text="@string/turn_on_flashlights"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                app:layout_constraintTop_toBottomOf="@+id/Ibutton_sleepMode" />
+
+            <ListView
+                android:overScrollMode="ifContentScrolls"
+                android:id="@+id/listView_stack_of_commands"
+                android:layout_width="match_parent"
+                android:layout_height="240dp"
+                android:background="@color/back_colour"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="180dp"
+                android:layout_marginStart="35dp"
+                app:layout_constraintStart_toStartOf="@+id/edittext_commandLine"
+                app:layout_constraintTop_toBottomOf="@+id/edittext_commandLine" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+</RelativeLayout>

@@ -192,14 +192,20 @@ public class FragmentBlindArriving extends Fragment {
         stack_of_commands.setEnabled(isEnabled);
     }
 
-    private void SleepMode(boolean enabled, Animation animation, String textState, int idDrawable) // Method, which disable/enable sleep mode
+    private void SleepMode(final boolean enabled, final Animation animation, final String textState,final int idDrawable)
+    // Method, which disable/enable sleep mode
     {
-        sleep_mode.setBackgroundResource(idDrawable);
-        state.setText(getString(R.string.state) +" "+ textState);
-        state.startAnimation(animation);
-        //Disable all components on the screen.
-        UIState(false);
-        commandLine.setEnabled(enabled);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                sleep_mode.setBackgroundResource(idDrawable);
+                state.setText(getString(R.string.state) +" "+ textState);
+                state.startAnimation(animation);
+                //Disable all components on the screen.
+                UIState(enabled);
+                commandLine.setEnabled(enabled);
+            }
+        });
     }
 
     private long getNumberFromCommand(String command) // Get number, if command has numbers
@@ -385,14 +391,11 @@ public class FragmentBlindArriving extends Fragment {
                 else
                 {
                     //Disable sleep mode
-                    state.startAnimation(AnimationUtils.loadAnimation(getContext(),R.anim.fadein));
                     SleepMode(true,AnimationUtils.loadAnimation(getContext(),R.anim.fadein),
                             "", R.drawable.style_button_rounded_black);
                     try {
                         new FileStream().SaveFile("", getActivity().openFileOutput(STATE_FILE, Context.MODE_PRIVATE));
-                    } catch (FileNotFoundException e) {
-                        e.printStackTrace();
-                    }
+                    } catch (FileNotFoundException e) { e.printStackTrace(); }
                 }
             }
         });
@@ -548,7 +551,7 @@ public class FragmentBlindArriving extends Fragment {
         };
 
         final Random random = new Random();
-        final Thread thread = new Thread(new Runnable() {
+        Thread add_thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 while (isAutoMode) // Check auto mode
@@ -610,9 +613,8 @@ public class FragmentBlindArriving extends Fragment {
             }
         });
 
-        thread.start();
+        add_thread.start();
         thread_pincers.start();
-
     }
 
     public void SaveState() // Method, which save current state of robot in files.
