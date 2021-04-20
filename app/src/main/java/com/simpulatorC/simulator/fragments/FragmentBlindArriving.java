@@ -50,7 +50,8 @@ public class FragmentBlindArriving extends Fragment {
         COMMANDS_FILE = "Commands",
         METERS_FILE = "Meters",
         FLASHLIGHTS_FILE = "Flashlight",
-        AUTO_FILE = "AutoState";
+        AUTO_FILE = "AutoState",
+        DISTANCE_FILE = "Distance";
 
     private EditText commandLine;
     private Button turnFlashlights;
@@ -73,8 +74,15 @@ public class FragmentBlindArriving extends Fragment {
     private void ChangeState(String stateName, long meters, String direction)
     {
         FileStream fileStream = new FileStream();
+
+        long distance = 0;
+        try {
+            distance = Long.parseLong(fileStream.ReadFile(getActivity().openFileInput(DISTANCE_FILE)));
+        } catch (FileNotFoundException e) { e.printStackTrace(); }
+
         try
         {
+            fileStream.SaveFile(String.valueOf(distance + meters), getActivity().openFileOutput(DISTANCE_FILE, Context.MODE_PRIVATE)); // Save common distance
             fileStream.SaveFile(stateName, getActivity().openFileOutput(STATE_FILE, Context.MODE_PRIVATE)); // Save state
             fileStream.SaveFile(String.valueOf(currentDelay),getActivity().openFileOutput(PREV_DELAY_FILE, Context.MODE_PRIVATE)); // Save distance
             fileStream.SaveFile(String.valueOf(meters), getActivity().openFileOutput(METERS_FILE, Context.MODE_PRIVATE));
@@ -649,6 +657,7 @@ public class FragmentBlindArriving extends Fragment {
         {
             FileStream fileStream = new FileStream();
             try { // Save time, stack of commands, autoMode, if user quited from app.
+                fileStream.SaveFile(String.valueOf(currentDelay/ 1500), getActivity().openFileOutput(DISTANCE_FILE, Context.MODE_PRIVATE));
                 fileStream.SaveFile(String.valueOf(Calendar.getInstance().getTimeInMillis()), getActivity().openFileOutput(TIME_FILE, Context.MODE_PRIVATE));
                 fileStream.SaveFile(String.valueOf(currentDelay), getActivity().openFileOutput(PREV_DELAY_FILE, Context.MODE_PRIVATE));
                 fileStream.SaveFile(String.valueOf(isAutoMode), getActivity().openFileOutput(AUTO_FILE, Context.MODE_PRIVATE));

@@ -7,12 +7,14 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.simpulatorC.simulator.fragments.FragmentBlindArriving;
 import com.simpulatorC.simulator.fragments.FragmentCamera;
+import com.simpulatorC.simulator.fragments.FragmentInformation;
 
 public class FragmentAdapterMain extends FragmentPagerAdapter {
 
     private Fragment[] fragments = {
             new FragmentCamera(),
-            new FragmentBlindArriving()
+            new FragmentBlindArriving(),
+            new FragmentInformation()
     };
 
     public FragmentAdapterMain(@NonNull FragmentManager fm) { super(fm); }

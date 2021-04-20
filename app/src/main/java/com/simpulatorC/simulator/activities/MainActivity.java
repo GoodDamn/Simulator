@@ -75,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
                 {
                     case 0: selectedPage = R.id.nav_camera; break;  // Page "Visual Odometry"
                     case 1: selectedPage = R.id.nav_blind_arriving; break; // Page "Blind Arriving"
+                    case 2: selectedPage = R.id.nav_information; break;
                 }
                 bottomNavigationView.setSelectedItemId(selectedPage);
             }
@@ -91,6 +92,9 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case R.id.nav_blind_arriving: // Page "Blind Arriving"
                         viewPager.setCurrentItem(1);
+                        break;
+                    case R.id.nav_information: // Page "Information"
+                        viewPager.setCurrentItem(2);
                         break;
                 }
                 return true;

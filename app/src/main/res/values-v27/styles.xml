@@ -16,4 +16,7 @@
     <style name="RoundedCircle">
         <item name="cornerSize">20%</item>
     </style>
+    <style name="Circle">
+        <item name="cornerSize">50%</item>
+    </style>
 </resources>

@@ -9,4 +9,8 @@
         android:icon="@drawable/ic_blind_arriving"
         android:title="@string/blind_arriving"/>
 
+    <item android:id="@+id/nav_information"
+        android:icon="@drawable/ic_info"
+        android:title="@string/Information"/>
+
 </menu>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/back_colour">
+
+    <TextView
+        android:id="@+id/information_distance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="125dp"
+        android:gravity="start"
+        android:text="@string/distance_traveled"
+        android:textColor="@color/textColour"
+        android:fontFamily="@font/rambla"
+        android:textSize="15sp"/>
+
+    <TextView
+        android:id="@+id/information_model"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/rambla"
+        android:gravity="start"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="125dp"
+        android:text="@string/model_ch_1750upd"
+        android:textColor="@color/textColour"
+        android:textSize="15sp"
+        app:layout_constraintTop_toBottomOf="@+id/information_distance"
+        tools:layout_editor_absoluteX="20dp" />
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/shapeableImageView"
+        android:layout_width="120dp"
+        android:layout_height="90dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="15dp"
+        android:background="@drawable/mars_rover_image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shapeAppearanceOverlay="@style/Circle" />
+
+    <TextView
+        android:id="@+id/information_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/rambla"
+        android:layout_marginTop="15dp"
+        android:gravity="start"
+        android:layout_marginHorizontal="15dp"
+        android:text="@string/info_operation_desc"
+        android:textColor="@color/textColour"
+        android:textSize="15sp"
+        app:layout_constraintTop_toBottomOf="@+id/shapeableImageView"
+        tools:layout_editor_absoluteX="20dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

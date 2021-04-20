@@ -38,4 +38,8 @@
     <string name="tap_here">Tap somewhere to back</string>
     <string name="auto_is_on">Auto mode is enabled</string>
     <string name="auto_is_off">Auto mode is disabled</string>
+    <string name="Information">Information</string>
+    <string name="distance_traveled">Distance traveled:</string>
+    <string name="model_ch_1750upd">Model: CH-1750UPD</string>
+    <string name="info_operation_desc">A car-sized Mars rover designed to explore the crater Jezero on Mars as part of NASA\'s Mars 2020 mission. It was manufactured by the Jet Propulsion Laboratory and launched on July 30, 2020, at 11:50 UTC. Confirmation that the rover successfully landed on Mars was received on February 18, 2021, at 20:55 UTC. As of April 23, 2021, Perseverance has been active on Mars for 62 sols (64 Earth days) since its landing. Following the rover\'s arrival, NASA named the landing site Octavia E. Butler Landing. Perseverance has a similar design to its predecessor rover, Curiosity, from which it was moderately upgraded. It carries seven primary payload instruments, 19 cameras, and two microphones. The rover is also carrying the mini-helicopter Ingenuity, or Ginny, an experimental aircraft and technology showcase that made the first powered flight on another planet on April 19, 2021.</string>
 </resources>
