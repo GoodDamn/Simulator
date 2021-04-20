@@ -36,4 +36,6 @@
     <string name="ItemRemoved">Removed</string>
     <string name="autoOnOff">\"auto off/on\" - Enable/disable auto mode.</string>
     <string name="tap_here">Tap somewhere to back</string>
+    <string name="auto_is_on">Auto mode is enabled</string>
+    <string name="auto_is_off">Auto mode is disabled</string>
 </resources>

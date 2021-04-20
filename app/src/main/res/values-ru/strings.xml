@@ -36,4 +36,6 @@
     <string name="ItemRemoved">Удалено</string>
     <string name="autoOnOff">\"авто вкл/выкл\" - Вкл./Выкл. режим автонавигации.</string>
     <string name="tap_here">Дотронься любой части экрана, чтобы вернуться</string>
+    <string name="auto_is_on">Авторежим включён</string>
+    <string name="auto_is_off">Авторежим выключен</string>
 </resources>

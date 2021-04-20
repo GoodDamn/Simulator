@@ -56,7 +56,7 @@ public class FragmentBlindArriving extends Fragment {
     private Button turnFlashlights;
     private ImageButton moveForward, moveRight,
         moveBack, moveLeft, sleep_mode, pincer_up, pincer_down,
-        clockwise, not_clockwise;
+        clockwise, not_clockwise, ib_autoMode;
     private TextView state;
     private Animation fadeIn_state, fadeOut_state;
     private boolean isMoving = false;
@@ -128,7 +128,6 @@ public class FragmentBlindArriving extends Fragment {
     {
         if (!isMoving)
         {
-            Log.d("123456", " " + meters + " " + delay);
             generalDrawable = button.getDrawable();
             // True, if robot isn't moving.
             isMoving = true;
@@ -192,9 +191,16 @@ public class FragmentBlindArriving extends Fragment {
         stack_of_commands.setEnabled(isEnabled);
     }
 
+    private void AutoMode(int idDrawable, String toast)
+    {
+        ShowToastMessage(toast);
+        ib_autoMode.setBackgroundResource(idDrawable);
+    }
+
     private void SleepMode(final boolean enabled, final Animation animation, final String textState,final int idDrawable)
     // Method, which disable/enable sleep mode
     {
+        ShowToastMessage(textState);
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -233,6 +239,7 @@ public class FragmentBlindArriving extends Fragment {
         }
         return com;
     }
+
 
     private void PincersActions(ImageButton button, MotionEvent motionEvent) // Method, which execute, when user touched
             // on button with pincer's icon
@@ -287,6 +294,7 @@ public class FragmentBlindArriving extends Fragment {
                 break;
             case "автовыкл": case "autooff": // Auto mode is disabled
                 isAutoMode = false;
+                AutoMode(R.drawable.style_button_rounded_black, getString(R.string.auto_is_off));
                 UIState(true);
                 SaveState();
             break;
@@ -302,16 +310,16 @@ public class FragmentBlindArriving extends Fragment {
                 SleepMode(false, fadeIn_state, getString(R.string.sleep), R.drawable.style_button_rounded_blue);
             break;
             case "moveforward": case "двигвперёд":
-                Move(getString(R.string.moveForward), moveForward, numSteps, 750 * numSteps);
+                Move(getString(R.string.moveForward), moveForward, numSteps, 1500 * numSteps);
             break; // Move forward
             case "moveback": case "двигназад":
-                Move(getString(R.string.moveBack), moveBack, numSteps, 750 * numSteps);
+                Move(getString(R.string.moveBack), moveBack, numSteps, 1500 * numSteps);
             break; // Move back
             case "moveright": case "двигвправо":
-                Move(getString(R.string.moveRight), moveRight, numSteps, 750 * numSteps);
+                Move(getString(R.string.moveRight), moveRight, numSteps, 1500 * numSteps);
                 break; // move right
             case "moveleft": case "двигвлево":
-                Move(getString(R.string.moveLeft), moveLeft, numSteps, 750 * numSteps);
+                Move(getString(R.string.moveLeft), moveLeft, numSteps, 1500 * numSteps);
             break; // move left
             default: // If user typed other command.
                 command = getString(R.string.dont_find_command);
@@ -346,6 +354,17 @@ public class FragmentBlindArriving extends Fragment {
         SetOnTouchListenerPincers(pincer_up);
         SetOnTouchListenerPincers(pincer_down);
         SetOnTouchListenerPincers(not_clockwise);
+
+
+        ib_autoMode = v.findViewById(R.id.Ibutton_autoMode);
+        ib_autoMode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (ib_autoMode.getBackground().getConstantState().equals(getDrawable(R.drawable.style_button_rounded_orange).getConstantState()))
+                    ExecuteCommand("autooff");
+                else ExecuteCommand("autoon");
+            }
+        });
 
         stack_of_commands.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -444,7 +463,7 @@ public class FragmentBlindArriving extends Fragment {
                         .equals(getDrawable(R.drawable.style_button_rounded_black).getConstantState()))
                     TurnOnOffFlashlight("on",Color.BLACK, getString(R.string.turn_off_flashlights),
                             R.drawable.style_button_rounded_yellow); // Change state of button on "Turn on"
-                else TurnOnOffFlashlight("off",Color.WHITE, getString(R.string.turn_on_flashlights),
+                else TurnOnOffFlashlight("off",getResources().getColor(R.color.textColour), getString(R.string.turn_on_flashlights),
                         R.drawable.style_button_rounded_black); // Change state of button on "Turn off"
 
             }
@@ -534,6 +553,7 @@ public class FragmentBlindArriving extends Fragment {
 
     private void StartAutoMode()
     {
+        if (isAutoMode) ib_autoMode.setBackgroundResource(R.drawable.style_button_rounded_orange);
 
         final String[] moves = new String[]{
                 getString(R.string.moveforward),
@@ -566,7 +586,7 @@ public class FragmentBlindArriving extends Fragment {
                                     @Override
                                     public void run() {
                                         final String text = moves[random.nextInt(4)] + random.nextInt(5000);
-                                        if (isMoving) adapter_commands.add(text);
+                                        if (isMoving){ adapter_commands.add(text); stack_of_commands.setAdapter(adapter_commands);}
                                         else ExecuteCommand(text);
 
                                         if (random.nextBoolean())
