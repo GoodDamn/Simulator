@@ -82,27 +82,34 @@ public class FragmentBlindArriving extends Fragment {
         } catch (FileNotFoundException e) { e.printStackTrace(); }
     }
 
+
     private void ReturnToGeneralState() // When handler is posted delayed.
     {
         if(thread != null) thread.interrupt(); // Close thread
         currentDelay = 0;
         ChangeState("",0,"nowhere");
         isMoving = false;
-        getActivity().runOnUiThread(new Runnable() {
-           @Override
-           public void run() {
-               state.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fadein));
-               state.setText(getString(R.string.state));
-               selectedDirection.setBackgroundResource(R.drawable.style_button_rounded_black);
-               selectedDirection.setImageDrawable(generalDrawable);
-               if (!adapter_commands.isEmpty())
-               {
-                   final String nextCommand = adapter_commands.getItem(0);
-                   ExecuteCommand(nextCommand);
-                   adapter_commands.remove(nextCommand);
-               }
-           }
+        state.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fadein));
+        state.post(new Runnable() {
+            @Override
+            public void run() {
+                state.setText(getString(R.string.state));
+            }
         });
+        selectedDirection.setBackgroundResource(R.drawable.style_button_rounded_black);
+        selectedDirection.setImageDrawable(generalDrawable);
+        if (!adapter_commands.isEmpty())
+        {
+            final String nextCommand = adapter_commands.getItem(0);
+            ExecuteCommand(nextCommand);
+            stack_of_commands.post(new Runnable() {
+                @Override
+                public void run() {
+                    adapter_commands.remove(nextCommand);
+                    stack_of_commands.setAdapter(adapter_commands);
+                }
+            });
+        }
     }
 
     private Drawable getDrawable(int id) { // Method, which return picture from project's resources.
