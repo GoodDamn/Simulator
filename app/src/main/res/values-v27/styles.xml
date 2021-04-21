@@ -12,4 +12,8 @@
         <item name="android:windowLightStatusBar">@bool/navLightBar</item>
         <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
     </style>
+
+    <style name="RoundedCircle">
+        <item name="cornerSize">20%</item>
+    </style>
 </resources>

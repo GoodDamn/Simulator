@@ -169,7 +169,7 @@
                 android:fontFamily="@font/rambla"
                 android:text="@string/turn_on_flashlights"
                 android:textAllCaps="false"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/textColour"
                 app:layout_constraintTop_toBottomOf="@+id/Ibutton_sleepMode" />
 
             <ListView

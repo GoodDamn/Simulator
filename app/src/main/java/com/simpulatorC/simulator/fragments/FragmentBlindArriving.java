@@ -88,40 +88,40 @@ public class FragmentBlindArriving extends Fragment {
         currentDelay = 0;
         ChangeState("",0,"nowhere");
         isMoving = false;
-        state.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fadein));
-        state.post(new Runnable() {
-            @Override
-            public void run() {
-                state.setText(getString(R.string.state));
-            }
+        getActivity().runOnUiThread(new Runnable() {
+           @Override
+           public void run() {
+               state.startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.fadein));
+               state.setText(getString(R.string.state));
+               selectedDirection.setBackgroundResource(R.drawable.style_button_rounded_black);
+               selectedDirection.setImageDrawable(generalDrawable);
+               if (!adapter_commands.isEmpty())
+               {
+                   final String nextCommand = adapter_commands.getItem(0);
+                   ExecuteCommand(nextCommand);
+                   adapter_commands.remove(nextCommand);
+               }
+           }
         });
-        selectedDirection.setBackgroundResource(R.drawable.style_button_rounded_black);
-        selectedDirection.setImageDrawable(generalDrawable);
-        if (!adapter_commands.isEmpty())
-        {
-            final String nextCommand = adapter_commands.getItem(0);
-            ExecuteCommand(nextCommand);
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    adapter_commands.remove(nextCommand);
-                }
-            });
-        }
     }
 
     private Drawable getDrawable(int id) { // Method, which return picture from project's resources.
         return getResources().getDrawable(id);
     }
 
-    private void TurnOnOffFlashlight(String state,int textColour, String text, int drawableId) // Method, which enable/disable flashlights
+    private void TurnOnOffFlashlight(final String state, final int textColour, final String text, final int drawableId) // Method, which enable/disable flashlights
     {
-        try { // Save state of flashlights (on/off)
-            new FileStream().SaveFile(state, getActivity().openFileOutput(FLASHLIGHTS_FILE, Context.MODE_PRIVATE));
-        } catch (FileNotFoundException e) { e.printStackTrace(); }
-        turnFlashlights.setBackgroundResource(drawableId);
-        turnFlashlights.setText(text);
-        turnFlashlights.setTextColor(textColour);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try { // Save state of flashlights (on/off)
+                    new FileStream().SaveFile(state, getActivity().openFileOutput(FLASHLIGHTS_FILE, Context.MODE_PRIVATE));
+                } catch (FileNotFoundException e) { e.printStackTrace(); }
+                turnFlashlights.setBackgroundResource(drawableId);
+                turnFlashlights.setText(text);
+                turnFlashlights.setTextColor(textColour);
+            }
+        });
     }
 
     private void Move(final String direction, final ImageButton button, final long meters, final long delay) // MOVE
@@ -331,7 +331,6 @@ public class FragmentBlindArriving extends Fragment {
         moveRight = v.findViewById(R.id.Ibutton_move_right); // Find button with right arrow
         stack_of_commands = v.findViewById(R.id.listView_stack_of_commands); // Find ListView
         adapter_commands = new ArrayAdapter<>(getContext(), R.layout.list_view_row); // Initialize adapter for listView
-
 
         clockwise = v.findViewById(R.id.Ibutton_clockwise);
         pincer_up = v.findViewById(R.id.Ibutton_pincer_up);

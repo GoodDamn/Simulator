@@ -32,6 +32,7 @@
                 android:imeOptions="actionDone"
                 android:paddingStart="25dp"
                 android:paddingEnd="15dp"
+                android:textSize="20sp"
                 android:singleLine="true"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -44,6 +45,7 @@
                 android:fontFamily="@font/rambla"
                 android:layout_marginHorizontal="60dp"
                 android:layout_marginTop="15dp"
+                android:textSize="20sp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toTopOf="parent"
@@ -62,10 +64,9 @@
             <ImageButton
                 android:id="@+id/Ibutton_move_forward"
                 android:layout_width="match_parent"
-                android:layout_marginStart="200dp"
+                android:layout_marginStart="450dp"
                 android:layout_marginEnd="35dp"
-                android:layout_height="45dp"
-                android:elevation="12dp"
+                android:layout_height="65dp"
                 android:layout_marginTop="15dp"
                 android:background="@drawable/style_button_rounded_black"
                 android:src="@drawable/ic_arrow_forward"
@@ -76,9 +77,8 @@
             <ImageButton
                 android:id="@+id/Ibutton_move_Left"
                 android:layout_width="match_parent"
-                android:layout_marginStart="200dp"
-                android:elevation="12dp"
-                android:layout_marginEnd="125dp"
+                android:layout_marginStart="450dp"
+                android:layout_marginEnd="200dp"
                 android:layout_height="150dp"
                 android:background="@drawable/style_button_rounded_black"
                 android:src="@drawable/ic_arrow_left"
@@ -89,8 +89,7 @@
                 android:id="@+id/Ibutton_move_right"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
-                android:layout_marginStart="290dp"
-                android:elevation="12dp"
+                android:layout_marginStart="620dp"
                 android:layout_marginEnd="35dp"
                 android:background="@drawable/style_button_rounded_black"
                 android:src="@drawable/ic_arrow_right"
@@ -100,10 +99,9 @@
             <ImageButton
                 android:id="@+id/Ibutton_move_back"
                 android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:layout_marginStart="200dp"
+                android:layout_height="65dp"
+                android:layout_marginStart="450dp"
                 android:layout_marginEnd="35dp"
-                android:elevation="12dp"
                 android:background="@drawable/style_button_rounded_black"
                 android:src="@drawable/ic_arrow_back"
                 app:layout_constraintEnd_toEndOf="@+id/Ibutton_move_right"
@@ -111,10 +109,9 @@
                 app:layout_constraintTop_toBottomOf="@+id/Ibutton_move_right" />
 
             <ImageButton
-                android:elevation="12dp"
                 android:id="@+id/Ibutton_sleepMode"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="75dp"
                 android:background="@drawable/style_button_rounded_black"
                 app:layout_constraintTop_toBottomOf="@+id/Ibutton_move_back"
                 android:layout_marginTop="25dp"
@@ -122,74 +119,70 @@
                 android:src="@drawable/moon"/>
 
             <ImageButton
-                android:elevation="12dp"
                 android:id="@+id/Ibutton_pincer_up"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginStart="200dp"
+                android:layout_height="65dp"
+                android:layout_marginStart="450dp"
                 android:layout_marginEnd="35dp"
                 android:background="@drawable/style_button_rounded_black"
                 android:src="@drawable/pincer_up"
                 app:layout_constraintTop_toTopOf="@+id/button_turnOnOff_Flashlights" />
 
             <ImageButton
-                android:elevation="12dp"
                 android:id="@+id/Ibutton_not_clockwise"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
-                android:layout_marginStart="200dp"
-                android:layout_marginEnd="125dp"
+                android:layout_marginStart="450dp"
+                android:layout_marginEnd="200dp"
                 android:background="@drawable/style_button_rounded_black"
                 android:src="@drawable/pincer_not_clockwise"
                 app:layout_constraintStart_toStartOf="@+id/Ibutton_move_forward"
                 app:layout_constraintTop_toBottomOf="@+id/Ibutton_pincer_up" />
 
             <ImageButton
-                android:elevation="12dp"
                 android:id="@+id/Ibutton_clockwise"
                 android:layout_width="match_parent"
                 android:layout_height="150dp"
                 android:layout_marginEnd="35dp"
-                android:layout_marginStart="290dp"
+                android:layout_marginStart="620dp"
                 android:background="@drawable/style_button_rounded_black"
                 android:src="@drawable/pincer_clockwise"
                 app:layout_constraintEnd_toEndOf="@+id/Ibutton_move_forward"
                 app:layout_constraintTop_toBottomOf="@+id/Ibutton_pincer_up" />
 
             <ImageButton
-                android:elevation="12dp"
                 android:id="@+id/Ibutton_pincer_down"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_marginStart="200dp"
+                android:layout_height="65dp"
+                android:layout_marginStart="450dp"
                 android:layout_marginEnd="35dp"
                 android:background="@drawable/style_button_rounded_black"
                 android:src="@drawable/pincer_down"
                 app:layout_constraintTop_toBottomOf="@+id/Ibutton_clockwise" />
 
             <Button
-                android:elevation="12dp"
                 android:id="@+id/button_turnOnOff_Flashlights"
                 android:layout_width="match_parent"
-                android:layout_height="245dp"
+                android:layout_height="280dp"
                 android:layout_marginStart="35dp"
                 android:layout_marginTop="15dp"
-                android:layout_marginEnd="230dp"
+                android:layout_marginEnd="400dp"
                 android:background="@drawable/style_button_rounded_black"
                 android:fontFamily="@font/rambla"
                 android:text="@string/turn_on_flashlights"
                 android:textAllCaps="false"
                 android:textColor="@color/textColour"
+                android:textSize="25sp"
                 app:layout_constraintTop_toBottomOf="@+id/Ibutton_sleepMode" />
 
             <ListView
                 android:overScrollMode="ifContentScrolls"
                 android:id="@+id/listView_stack_of_commands"
                 android:layout_width="match_parent"
-                android:layout_height="240dp"
+                android:layout_height="280dp"
                 android:background="@color/back_colour"
                 android:layout_marginTop="15dp"
-                android:layout_marginEnd="230dp"
+                android:layout_marginEnd="400dp"
                 android:layout_marginStart="35dp"
                 app:layout_constraintStart_toStartOf="@+id/edittext_commandLine"
                 app:layout_constraintTop_toBottomOf="@+id/edittext_commandLine" />

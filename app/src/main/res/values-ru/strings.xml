@@ -35,4 +35,5 @@
     <string name="cancel">Отмена</string>
     <string name="ItemRemoved">Удалено</string>
     <string name="autoOnOff">\"авто вкл/выкл\" - Вкл./Выкл. режим автонавигации.</string>
+    <string name="tap_here">Дотронься любой части экрана, чтобы вернуться</string>
 </resources>

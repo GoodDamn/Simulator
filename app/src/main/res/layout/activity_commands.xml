@@ -123,6 +123,19 @@
                 android:textSize="19sp"
                 app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
+            <TextView
+                android:id="@+id/textView12"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="35dp"
+                android:fontFamily="@font/rambla"
+                android:gravity="center"
+                android:layout_marginTop="15dp"
+                android:text="@string/tap_here"
+                android:textColor="@color/textColour"
+                android:textSize="19sp"
+                app:layout_constraintTop_toBottomOf="@+id/textView10" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 

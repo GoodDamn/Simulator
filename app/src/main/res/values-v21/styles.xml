@@ -9,4 +9,8 @@
         <item name="android:navigationBarColor">@color/NavBottomBar_back_colour</item>
         <item name="android:statusBarColor">@color/back_colour</item>
     </style>
+
+    <style name="RoundedCircle">
+        <item name="cornerSize">20%</item>
+    </style>
 </resources>
